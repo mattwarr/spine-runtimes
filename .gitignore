@@ -5,6 +5,7 @@ spine-libgdx/bin/*
 spine-libgdx/libs/*
 target
 
+.idea/
 *Debug.win32
 *.sdf
 *.opensdf

@@ -1,0 +1,6 @@
+jni/include/spine-c/
+jni/spine-c/
+obj/
+gen/
+bin/
+libs/
