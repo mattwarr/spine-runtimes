@@ -32,7 +32,9 @@ JNIEXPORT jlong JNICALL Java_com_carboncrystal_spine_SpineAnimation_create(JNIEn
 	const char* sPath = env->GetStringUTFChars(skeletonPath, 0);
 
 	SpineCallback* callback = new SpineCallback(jAnimation);
-	SpineAnimation* animation = new SpineAnimation(aPath, sPath, callback );
+	SpineAnimation* animation = new SpineAnimation(sPath, callback);
+
+	animation->initWithAtlasPath(aPath);
 
 	env->ReleaseStringUTFChars(atlasPath, aPath);
 	env->ReleaseStringUTFChars(skeletonPath, sPath);

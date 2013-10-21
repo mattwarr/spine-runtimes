@@ -9,12 +9,24 @@
 #include <SpineCallback.h>
 
 
-SpineAnimation::SpineAnimation(const char* atlasPath, const char* skeletonPath, SpineCallback* cb) {
-
+SpineAnimation::SpineAnimation(const char* sp, SpineCallback* cb) {
 	this->callback = cb;
+	this->skeletonPath = sp;
+}
 
+void SpineAnimation::initWithAtlasPath(const char* atlasPath) {
 	spAtlas* atlas = spAtlas_readAtlasFile(atlasPath);
+	this->initWithAtlas(atlas, skeletonPath);
+	spAtlas_dispose(atlas);
+}
 
+void SpineAnimation::initWithAtlasData(const char* atlasData, int length) {
+	spAtlas* atlas = spAtlas_readAtlas(atlasData, length, '\0');
+	this->initWithAtlas(atlas, skeletonPath);
+	spAtlas_dispose(atlas);
+}
+
+void SpineAnimation::initWithAtlas(spAtlas* atlas, const char* skeletonPath) {
 	spSkeletonJson* json = spSkeletonJson_create(atlas);
 
 	skeletonData = spSkeletonJson_readSkeletonDataFile(json, skeletonPath);
@@ -38,8 +50,6 @@ SpineAnimation::SpineAnimation(const char* atlasPath, const char* skeletonPath, 
 	}
 
 	spSkeletonJson_dispose(json);
-	spAtlas_dispose(atlas);
-
 }
 
 bool SpineAnimation::setAnimation(int trackIndex, const char* name, bool loop) {
