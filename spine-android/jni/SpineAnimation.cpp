@@ -8,54 +8,23 @@
 #include <SpineAnimation.h>
 #include <SpineCallback.h>
 
-
-SpineAnimation::SpineAnimation(const char* sp, SpineCallback* cb) {
+SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* cb) {
 	this->callback = cb;
-	this->skeletonPath = sp;
-}
+	this->skeleton = spSkeleton_create(sd);
+	this->state = spAnimationState_create(spAnimationStateData_create(skeleton->data));
+	this->callback->onSkeletonCreate(env, skeleton->slotCount);
 
-void SpineAnimation::initWithAtlasPath(const char* atlasPath) {
-	spAtlas* atlas = spAtlas_readAtlasFile(atlasPath);
-	this->initWithAtlas(atlas, skeletonPath);
-	spAtlas_dispose(atlas);
-}
+	int i;
 
-void SpineAnimation::initWithAtlasData(const char* atlasData, int length) {
-	spAtlas* atlas = spAtlas_readAtlas(atlasData, length, '\0');
-	this->initWithAtlas(atlas, skeletonPath);
-	spAtlas_dispose(atlas);
-}
-
-void SpineAnimation::initWithAtlas(spAtlas* atlas, const char* skeletonPath) {
-	spSkeletonJson* json = spSkeletonJson_create(atlas);
-
-	skeletonData = spSkeletonJson_readSkeletonDataFile(json, skeletonPath);
-
-	if (!skeletonData) {
-		this->callback->onError("Error loading skeleton data (%s) not found", json->error);
+	for(i = 0; i < skeleton->slotCount; i++) {
+		this->callback->addBone(env, i, skeleton->slots[i]->attachment->name);
 	}
-	else {
-
-		skeleton = spSkeleton_create(skeletonData);
-
-		state = spAnimationState_create(spAnimationStateData_create(skeleton->data));
-
-		this->callback->onSkeletonCreate(skeleton->slotCount);
-
-		int i;
-
-		for(i = 0; i < skeleton->slotCount; i++) {
-			this->callback->addBone(i, skeleton->slots[i]->attachment->name);
-		}
-	}
-
-	spSkeletonJson_dispose(json);
 }
 
-bool SpineAnimation::setAnimation(int trackIndex, const char* name, bool loop) {
+bool SpineAnimation::setAnimation(JNIEnv* env, int trackIndex, const char* name, bool loop) {
 	spAnimation* animation = spSkeletonData_findAnimation(skeleton->data, name);
 	if (!animation) {
-		callback->onError("Animation not found: %s", (char*) name);
+		callback->onError(env, "Animation not found: %s", (char*) name);
 		return false;
 	}
 	else {
@@ -64,18 +33,19 @@ bool SpineAnimation::setAnimation(int trackIndex, const char* name, bool loop) {
 	}
 }
 
-void SpineAnimation::step(float deltaTime) {
+void SpineAnimation::step(JNIEnv* env, float deltaTime) {
 
 	spAnimationState_update(state, deltaTime);
 	spAnimationState_apply(state, skeleton);
 	spSkeleton_updateWorldTransform(skeleton);
 
 	int i;
-	for(i = 0; i < skeleton->boneCount; i++) {
+	for(i = 0; i < skeleton->slotCount; i++) {
 
-		spBone* data = skeleton->bones[i];
+		spBone* data = skeleton->slots[i]->bone;
 
 		callback->onBoneStep(
+				env,
 				i,
 				data->worldX,
 				data->worldY,
@@ -85,11 +55,7 @@ void SpineAnimation::step(float deltaTime) {
 	}
 }
 
-SpineAnimation::~SpineAnimation() {
-	if (this->skeletonData) {
-		spSkeletonData_dispose(this->skeletonData);
-	}
-
+void SpineAnimation::destroy(JNIEnv* env) {
 	if (this->skeleton) {
 		spSkeleton_dispose(this->skeleton);
 	}
@@ -98,5 +64,9 @@ SpineAnimation::~SpineAnimation() {
 		spAnimationState_dispose(this->state);
 	}
 
+	this->callback->destroy(env);
+
 	delete this->callback;
 }
+
+SpineAnimation::~SpineAnimation() {}

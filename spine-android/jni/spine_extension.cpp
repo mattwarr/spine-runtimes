@@ -10,7 +10,6 @@ void _spAtlasPage_disposeTexture (spAtlasPage* self) {}
 
 char* _spUtil_readFile (const char* path, int* length) {
 
-	JNIEnv* env = (JNIEnv*) get_jni_env();
 	AAssetManager* assetManager = (AAssetManager*) get_asset_manager();
 
 	AAsset* asset = AAssetManager_open(assetManager, (const char *) path, AASSET_MODE_UNKNOWN);

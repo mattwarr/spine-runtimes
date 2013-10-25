@@ -31,14 +31,6 @@ JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_destroy
 JNIEXPORT jboolean JNICALL Java_com_carboncrystal_spine_SpineAnimation_setAnimation
   (JNIEnv *, jobject, jlong, jint, jstring, jboolean);
 
-/*
- * Class:     com_carboncrystal_spine_SpineAnimation
- * Method:    create
- * Signature: (Lcom/carboncrystal/spine/SpineAnimation;Ljava/lang/String;Ljava/lang/String;)J
- */
-JNIEXPORT jlong JNICALL Java_com_carboncrystal_spine_SpineAnimation_create
-  (JNIEnv *, jobject, jobject, jstring, jstring);
-
 #ifdef __cplusplus
 }
 #endif

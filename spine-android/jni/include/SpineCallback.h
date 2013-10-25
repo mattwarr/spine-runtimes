@@ -13,16 +13,18 @@
 class SpineCallback {
 
 public:
-	SpineCallback(jobject jCallback);
+	SpineCallback(JNIEnv* env, jobject jCallback);
 	virtual ~SpineCallback();
 
-	void onSkeletonCreate(int numBones);
+	void onSkeletonCreate(JNIEnv* env, int numBones);
 
-	void addBone(int index, const char* name);
+	void addBone(JNIEnv* env, int index, const char* name);
 
-	void onBoneStep(int index, float x, float y, float rotation, float scaleX, float scaleY);
+	void onBoneStep(JNIEnv* env, int index, float x, float y, float rotation, float scaleX, float scaleY);
 
-	void onError(const char * format, ...);
+	void onError(JNIEnv* env, const char * format, ...);
+
+	void destroy(JNIEnv* env);
 
 private:
 	jobject jCallback;
@@ -30,7 +32,6 @@ private:
 	jmethodID stepBoneID;
 	jmethodID onCreateID;
 	jmethodID addBoneID;
-	JNIEnv* env;
 
 };
 

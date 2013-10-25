@@ -12,7 +12,7 @@ extern "C" {
  * Method:    init
  * Signature: (Landroid/content/res/AssetManager;)V
  */
-JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineContext_init
+JNIEXPORT jlong JNICALL Java_com_carboncrystal_spine_SpineContext_init
   (JNIEnv *, jclass, jobject);
 
 #ifdef __cplusplus

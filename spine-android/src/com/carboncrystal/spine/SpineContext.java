@@ -4,8 +4,12 @@ import android.content.Context;
 import android.content.res.AssetManager;
 
 public class SpineContext {
+	static long NULL;
 	public static void init(Context context) {
-		init(context.getAssets());
+		NULL = init(context.getAssets());
 	}
-	static native void init(AssetManager manager);
+	static native long init(AssetManager manager);
+	static boolean isNULL(long addr) {
+		return addr == NULL;
+	}
 }

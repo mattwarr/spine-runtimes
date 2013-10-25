@@ -5,6 +5,7 @@
         <javah destdir="jni/include" force="yes" classpath="bin/classes;/android/platforms/android-17/android.jar">
             <class name="com.carboncrystal.spine.SpineContext"/>
             <class name="com.carboncrystal.spine.SpineAnimation"/>
+            <class name="com.carboncrystal.spine.SpineAnimationFactory"/>
         </javah>
 
     </target>

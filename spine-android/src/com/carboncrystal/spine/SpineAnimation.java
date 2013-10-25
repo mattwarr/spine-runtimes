@@ -1,18 +1,17 @@
 package com.carboncrystal.spine;
 
-public abstract class SpineAnimation {
+public class SpineAnimation {
 
-	private SpineBone[] bones;
+	public final int index;
 
-	private final String atlasPath;
-	private final String skeletonPath;
+	public SpineBone[] bones;
+
+	private SpineAnimationListener animationListener;
 
 	long addr;
 
-	protected SpineAnimation(String atlasPath, String skeletonPath) {
-		this.atlasPath = atlasPath;
-		this.skeletonPath = skeletonPath;
-		this.addr = create(this, atlasPath, skeletonPath);
+	SpineAnimation(int index) {
+		this.index = index;
 	}
 
 	final void onSkeletonCreate(int numBones) {
@@ -31,10 +30,11 @@ public abstract class SpineAnimation {
 		bone.angle = rotation;
 		bone.scaleX = scaleX;
 		bone.scaleY = scaleY;
-		onUpdate(bone);
-	}
 
-	public abstract void onUpdate(SpineBone bone);
+		if(animationListener != null) {
+			animationListener.onUpdate(bone);
+		}
+	}
 
 	public final void step(long deltaTime) {
 		step(addr, deltaTime);
@@ -48,11 +48,13 @@ public abstract class SpineAnimation {
 		destroy(addr);
 	}
 
+	public void setAnimationListener(SpineAnimationListener animationListener) {
+		this.animationListener = animationListener;
+	}
+
 	native void step(long addr, float deltaTime);
 
 	native void destroy(long addr);
 
 	native boolean setAnimation(long addr, int trackIndex, String name, boolean loop);
-
-	native long create(SpineAnimation animation, String atlasPath, String skeletonPath);
 }
