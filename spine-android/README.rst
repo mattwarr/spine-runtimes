@@ -11,19 +11,32 @@ Init the context ::
 
 	SpineContext.init(this);
 
-Load an animation::
-	
-	SpineAnimation animation = new SpineAnimation("spineboy.atlas", "spineboy.json") {
-		@Override
-		public void onUpdate(SpineBone bone) {
-		    // This will be called when each bone in the skeleton is updated.
-			Log.w("SpineDemo", bone.toString());
-		}
-	};
+Create a factory (number of animations must be specified) ::
 
-	if(animation.setAnimation(1, "walk", true)) {
-	    // Step with delat time
-		animation.step(10);
+	SpineAnimationFactory factory = new SpineAnimationFactory("spineboy.atlas", "spineboy.json", 1);
+
+Create an animation::
+
+	SpineAnimation animation = factory.create();
+
+
+Optionally add a listener::
+
+    animation.setAnimationListener(new SpineAnimationListener() {
+        @Override
+        public void onUpdate(SpineBone bone) {
+            // Called for each bone during step
+        }
+    });
+
+Step the animation::
+
+	animation.step(delta); // delta is in milliseconds
+
+Get the bone data::
+
+	for (SpineBone bone : animation.bones) {
+	    // Update in-game objects with SRT from bone
 	}
 
 On destroy::
