@@ -10,10 +10,4 @@
 
     </target>
 
-    <target name="build">
-        <exec executable="${ndk.dir}/ndk-build" failonerror="true"/>
-        <copy file="obj/local/armeabi/libspine.so" todir="/Users/Jason/projects/littlewars/android/littlewars/spine-demo/libs/armeabi" overwrite="true"/>
-        <copy file="obj/local/armeabi-v7a/libspine.so" todir="/Users/Jason/projects/littlewars/android/littlewars/spine-demo/libs/armeabi-v7a" overwrite="true"/>
-    </target>
-
 </project>
