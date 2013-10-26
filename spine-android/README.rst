@@ -23,6 +23,9 @@ Create an animation::
 
 	SpineAnimation animation = factory.create();
 
+Set the animation and track::
+
+    animation.setAnimation(0, "walk", true);
 
 Optionally add a listener::
 
