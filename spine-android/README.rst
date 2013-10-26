@@ -1,6 +1,10 @@
 Simple Android Spine Runtime
 ----------------------------
 
+Build the library::
+
+    ndk-build
+
 Load the lib::
 
 	static {
