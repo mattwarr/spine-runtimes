@@ -37,7 +37,7 @@ public class SpineAnimation {
 	}
 
 	public final void step(long deltaTime) {
-		step(addr, deltaTime);
+		step(addr, (float)deltaTime/1000.0f); // Spine steps in seconds.
 	}
 
 	public final boolean setAnimation(int trackIndex, String name, boolean loop) {
