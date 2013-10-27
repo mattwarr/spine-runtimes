@@ -15,9 +15,17 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 	this->callback->onSkeletonCreate(env, skeleton->slotCount);
 
 	int i;
-
+	// Update transform so the bone's world position is set
+	spSkeleton_updateWorldTransform(skeleton);
 	for(i = 0; i < skeleton->slotCount; i++) {
-		this->callback->addBone(env, i, skeleton->slots[i]->bone->data->name);
+		spBone* data = skeleton->slots[i]->bone;
+		this->callback->addBone(env, i,
+				data->data->name,
+				data->worldX,
+				data->worldY,
+				data->worldRotation,
+				data->worldScaleX,
+				data->worldScaleY);
 	}
 }
 

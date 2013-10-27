@@ -15,17 +15,20 @@
 SpineAnimationFactory::SpineAnimationFactory(const char* skeletonPath) {
 	int length;
 	this->error = false;
-	this->attachmentLoader = (spAttachmentLoader*) spEmptyAttachmentLoader_create();
+	this->attachmentLoader =
+			(spAttachmentLoader*) spEmptyAttachmentLoader_create();
 
-	spSkeletonJson* skeletonJson = spSkeletonJson_createWithLoader(this->attachmentLoader);
+	spSkeletonJson* skeletonJson = spSkeletonJson_createWithLoader(
+			this->attachmentLoader);
 
 	const char* json = _spUtil_readFile(skeletonPath, &length);
 
 	this->skeletonData = spSkeletonJson_readSkeletonData(skeletonJson, json);
 
-	if(skeletonJson->error) {
+	if (skeletonJson->error) {
 		this->error = true;
-		__android_log_print(ANDROID_LOG_ERROR, "SpineAndroid", "Error creating spSkeletonJson: %s", skeletonJson->error);
+		__android_log_print(ANDROID_LOG_ERROR, "SpineAndroid",
+				"Error creating spSkeletonJson: %s", skeletonJson->error);
 	}
 
 	spSkeletonJson_dispose(skeletonJson);
@@ -33,16 +36,16 @@ SpineAnimationFactory::SpineAnimationFactory(const char* skeletonPath) {
 }
 
 SpineAnimationFactory::~SpineAnimationFactory() {
-	if(this->skeletonData != NULL) {
+	if (this->skeletonData != NULL) {
 		spSkeletonData_dispose(this->skeletonData);
 	}
-	if(this->attachmentLoader != NULL) {
+	if (this->attachmentLoader != NULL) {
 		spAttachmentLoader_dispose(this->attachmentLoader);
 	}
 }
 
 SpineAnimation* SpineAnimationFactory::create(JNIEnv* env, SpineCallback* cb) {
-	if(this->skeletonData != NULL) {
+	if (this->skeletonData != NULL) {
 		return new SpineAnimation(env, this->skeletonData, cb);
 	}
 	return NULL;

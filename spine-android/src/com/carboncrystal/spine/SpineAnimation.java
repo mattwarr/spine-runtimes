@@ -1,5 +1,7 @@
 package com.carboncrystal.spine;
 
+import java.util.Map;
+
 public class SpineAnimation {
 
 	public final int index;
@@ -7,12 +9,16 @@ public class SpineAnimation {
 	public SpineBone[] bones;
 
 	private SpineAnimationListener animationListener;
+	private SpineAnimationInitListener initListener;
+
+	private final Map<String, String> nameLookup;
 
 	long addr;
 	boolean destroyed = false;
 
-	SpineAnimation(int index) {
+	SpineAnimation(int index, Map<String, String> nameLookup) {
 		this.index = index;
+		this.nameLookup = nameLookup;
 	}
 
 	// Called from native
@@ -23,9 +29,19 @@ public class SpineAnimation {
 
 	// Called from native
 	@SuppressWarnings("unused")
-	final void addBone(int index, String name) {
-		bones[index] = new SpineBone();
-		bones[index].name = name;
+	final void addBone(int index, String name, float x, float y, float rotation, float scaleX, float scaleY) {
+		SpineBone bone = new SpineBone();
+		bone.name = name;
+		bone.attachment = nameLookup.get(name);
+		bone.x = x;
+		bone.y = y;
+		bone.rotation = rotation;
+		bone.scaleX = scaleX;
+		bone.scaleY = scaleY;
+		bones[index] = bone;
+		if(initListener != null) {
+			initListener.onCreateBone(bone);
+		}
 	}
 
 	// Called from native
@@ -34,7 +50,7 @@ public class SpineAnimation {
 		SpineBone bone = bones[index];
 		bone.x = x;
 		bone.y = y;
-		bone.angle = rotation;
+		bone.rotation = rotation;
 		bone.scaleX = scaleX;
 		bone.scaleY = scaleY;
 
@@ -66,6 +82,10 @@ public class SpineAnimation {
 
 	public void setAnimationListener(SpineAnimationListener animationListener) {
 		this.animationListener = animationListener;
+	}
+
+	void setInitListener(SpineAnimationInitListener initListener) {
+		this.initListener = initListener;
 	}
 
 	native void step(long addr, float deltaTime);

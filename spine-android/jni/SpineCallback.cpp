@@ -18,7 +18,7 @@ SpineCallback::SpineCallback(JNIEnv* env, jobject jCallback) {
 	this->jCallback = env->NewGlobalRef(jCallback);
 	callbackClass = env->FindClass("com/carboncrystal/spine/SpineAnimation");
 	onCreateID = env->GetMethodID(callbackClass, "onSkeletonCreate", "(I)V");
-	addBoneID = env->GetMethodID(callbackClass, "addBone", "(ILjava/lang/String;)V");
+	addBoneID = env->GetMethodID(callbackClass, "addBone", "(ILjava/lang/String;FFFFF)V");
 	stepBoneID = env->GetMethodID(callbackClass, "onBoneStep", "(IFFFFF)V");
 }
 
@@ -32,9 +32,9 @@ void SpineCallback::onSkeletonCreate(JNIEnv* env, int numBones) {
 	env->CallVoidMethod(jCallback, onCreateID, numBones);
 }
 
-void SpineCallback::addBone(JNIEnv* env, int index, const char* name) {
+void SpineCallback::addBone(JNIEnv* env, int index, const char* name, float x, float y, float rotation, float scaleX, float scaleY) {
 	jstring jString = env->NewStringUTF(name);
-	env->CallVoidMethod(jCallback, addBoneID, index, jString);
+	env->CallVoidMethod(jCallback, addBoneID, index, jString, x, y, rotation, scaleX, scaleY);
 	env->DeleteLocalRef(jString);
 }
 
