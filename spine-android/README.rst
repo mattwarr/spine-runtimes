@@ -1,6 +1,18 @@
 Simple Android Spine Runtime
 ----------------------------
 
+For the project I am working on I needed a simplified version of a spine runtime that did not depend on any external
+rendering engines and simply allowed me to load and run an animation from spine with just raw SRT
+(Scale, Rotation, Transformation) data reported for the bones in the animation.
+
+This implementation leverages the spine-c implementation and provides a simple JNI wrapper for use in Android.
+
+The JSON file produced by spline simply needs to be placed in the **assets** folder of your android app.
+
+ .. note::
+
+    This library is limited to running simple animations and is not a full spine runtime.
+
 Build the library::
 
     ndk-build
@@ -25,7 +37,11 @@ Create an animation::
 
 Set the animation and track::
 
-    animation.setAnimation(0, "walk", true);
+    animation.setAnimation(0, "jump", false);
+
+Optionally add an animation to the track::
+
+    animation.addAnimation(0, "walk", true, 0);
 
 Optionally add a listener::
 
@@ -46,6 +62,6 @@ Get the bone data::
 	    // Update in-game objects with SRT from bone
 	}
 
-On destroy::
+On destroy clean up::
 
     animation.destroy();
