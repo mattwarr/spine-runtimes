@@ -1,5 +1,11 @@
 package com.carboncrystal.spine;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.util.Log;
+
+import java.io.IOException;
+
 public class SpineAnimationFactory {
 
 	private final long addr;
@@ -7,8 +13,24 @@ public class SpineAnimationFactory {
 	private int createIndex = 0;
 	private final int size;
 
-	public SpineAnimationFactory(String atlasPath, String skeletonPath, int size) {
-		this.addr = create(atlasPath, skeletonPath);
+	public SpineAnimationFactory(Context context, String skeletonPath, int size) {
+
+		// We're not going to verify on the native side, so do it here
+		AssetManager am = context.getAssets();
+
+
+		if(!verifyPath(am, skeletonPath)) {
+			throw new RuntimeException("Cannot create factory.  Skeleton path [" +
+					skeletonPath +
+					"] does not exist");
+		}
+
+		this.addr = create(skeletonPath);
+
+		if(SpineContext.isNULL(this.addr)) {
+			throw new RuntimeException("Failed to create factory.  Check logs for error");
+		}
+
 		this.animations = new SpineAnimation[size];
 		this.size = size;
 	}
@@ -59,7 +81,24 @@ public class SpineAnimationFactory {
 		}
 	}
 
-	native long create(String atlasPath, String skeletonPath);
+	boolean verifyPath(AssetManager assets, String name) {
+		try {
+			String[] assetList = assets.list("");
+			if (assetList != null && assetList.length > 0) {
+				for (String item : assetList) {
+					if (name.equals(item)) {
+						return true;
+					}
+				}
+			}
+		}
+		catch (IOException e) {
+			Log.w("SpineAndroid", e);
+		}
+		return false;
+	}
+
+	native long create(String skeletonPath);
 
 	native long createAnimation(long addr, SpineAnimation callback);
 

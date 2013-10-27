@@ -1,13 +1,10 @@
 <project name="spine-android-custom">
 
     <target name="javah">
-
-        <javah destdir="jni/include" force="yes" classpath="bin/classes;/android/platforms/android-17/android.jar">
+        <javah destdir="jni/include" verbose="true" force="yes" classpath="bin/classes;${sdk.dir}/platforms/android-17/android.jar">
             <class name="com.carboncrystal.spine.SpineContext"/>
             <class name="com.carboncrystal.spine.SpineAnimation"/>
             <class name="com.carboncrystal.spine.SpineAnimationFactory"/>
         </javah>
-
     </target>
-
 </project>

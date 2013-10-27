@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL Java_com_carboncrystal_spine_SpineAnimationFactory_create
-  (JNIEnv *, jobject, jstring, jstring);
+  (JNIEnv *, jobject, jstring);
 
 /*
  * Class:     com_carboncrystal_spine_SpineAnimationFactory

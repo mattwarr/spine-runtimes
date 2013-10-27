@@ -23,6 +23,8 @@ public:
 
 	bool setAnimation(JNIEnv* env, int trackIndex, const char* name, bool loop);
 
+	bool addAnimation(JNIEnv* env, int trackIndex, const char* name, bool loop, float delay);
+
 	void step(JNIEnv* env, float deltaTime);
 
 	void destroy(JNIEnv* env);

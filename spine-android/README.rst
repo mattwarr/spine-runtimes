@@ -17,7 +17,7 @@ Init the context ::
 
 Create a factory (number of animations must be specified) ::
 
-	SpineAnimationFactory factory = new SpineAnimationFactory("spineboy.atlas", "spineboy.json", 1);
+	SpineAnimationFactory factory = new SpineAnimationFactory(this, "spineboy.json", 1);
 
 Create an animation::
 

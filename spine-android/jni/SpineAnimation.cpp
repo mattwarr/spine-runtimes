@@ -17,7 +17,7 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 	int i;
 
 	for(i = 0; i < skeleton->slotCount; i++) {
-		this->callback->addBone(env, i, skeleton->slots[i]->attachment->name);
+		this->callback->addBone(env, i, skeleton->slots[i]->bone->data->name);
 	}
 }
 
@@ -29,6 +29,18 @@ bool SpineAnimation::setAnimation(JNIEnv* env, int trackIndex, const char* name,
 	}
 	else {
 		spAnimationState_setAnimation(state, trackIndex, animation, loop);
+		return true;
+	}
+}
+
+bool SpineAnimation::addAnimation(JNIEnv* env, int trackIndex, const char* name, bool loop, float delay) {
+	spAnimation* animation = spSkeletonData_findAnimation(skeleton->data, name);
+	if (!animation) {
+		callback->onError(env, "Animation not found: %s", (char*) name);
+		return false;
+	}
+	else {
+		spAnimationState_addAnimation(state, trackIndex, animation, loop, delay);
 		return true;
 	}
 }
