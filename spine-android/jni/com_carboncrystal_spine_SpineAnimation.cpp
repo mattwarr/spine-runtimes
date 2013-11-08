@@ -22,6 +22,13 @@ JNIEXPORT jboolean JNICALL Java_com_carboncrystal_spine_SpineAnimation_setAnimat
 	return false;
 }
 
+JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_setXY (JNIEnv *env, jobject caller, jlong addr, jfloat x, jfloat y) {
+	SpineAnimation* anim = (SpineAnimation*) addr;
+	if(anim) {
+		anim->setXY(x, y);
+	}
+}
+
 JNIEXPORT jboolean JNICALL Java_com_carboncrystal_spine_SpineAnimation_addAnimation
   (JNIEnv *env, jobject caller, jlong addr, jint trackIndex, jstring name, jboolean loop, jfloat delay) {
 	SpineAnimation* anim = (SpineAnimation*) addr;
@@ -33,8 +40,6 @@ JNIEXPORT jboolean JNICALL Java_com_carboncrystal_spine_SpineAnimation_addAnimat
 	}
 	return false;
 }
-
-
 
 JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_destroy(JNIEnv *e, jobject caller,  jlong addr) {
 	SpineAnimation* anim = (SpineAnimation*) addr;

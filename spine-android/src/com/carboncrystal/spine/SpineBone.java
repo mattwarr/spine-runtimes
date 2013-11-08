@@ -1,25 +1,34 @@
 package com.carboncrystal.spine;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
 public class SpineBone {
-	public float x;
-	public float y;
-	public float rotation;
-	public float scaleX;
-	public float scaleY;
+//	public final SRT worldSRT;
+//	public final SRT localSRT;
+	public final SpineSkin skin;
 	public String name;
-	public String attachment;
+	public SpineAttachment attachment;
 	public Object userData;
+
+
+
+	public SpineBone() {
+//		worldSRT = new SRT();
+//		localSRT = new SRT();
+		skin = new SpineSkin();
+	}
 
 	@Override
 	public String toString() {
 		return "SpineBone{" +
-				"x=" + x +
-				", y=" + y +
-				", rotation=" + rotation +
-				", scaleX=" + scaleX +
-				", scaleY=" + scaleY +
+//				"worldSRT=" + worldSRT +
+//				", localSRT=" + localSRT +
+				", skin=" + skin +
 				", name='" + name + '\'' +
-				", attachment='" + attachment + '\'' +
+				", attachment=" + attachment +
+				", userData=" + userData +
 				'}';
 	}
 }

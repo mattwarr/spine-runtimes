@@ -1,5 +1,8 @@
 package com.carboncrystal.spine;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.Map;
 
 public class SpineAnimation {
@@ -11,34 +14,49 @@ public class SpineAnimation {
 	private SpineAnimationListener animationListener;
 	private SpineAnimationInitListener initListener;
 
-	private final Map<String, String> nameLookup;
+	private final Map<String, SpineAttachment> slots;
+
+
+	static final int BYTES_PER_FLOAT = 4;
+	static final int FLOATS_PER_BONE = 8;
+
+	public FloatBuffer vertices;
 
 	long addr;
 	boolean destroyed = false;
 
-	SpineAnimation(int index, Map<String, String> nameLookup) {
+	SpineAnimation(int index, Map<String, SpineAttachment> slots) {
 		this.index = index;
-		this.nameLookup = nameLookup;
+		this.slots = slots;
 	}
 
 	// Called from native
 	@SuppressWarnings("unused")
-	final void onSkeletonCreate(int numBones) {
+	final FloatBuffer onSkeletonCreate(int numBones) {
 		bones = new SpineBone[numBones];
+
+		// Allocate the native buffer
+		vertices = ByteBuffer.allocateDirect(BYTES_PER_FLOAT * FLOATS_PER_BONE * numBones).order(ByteOrder.nativeOrder()).asFloatBuffer();
+
+		return vertices;
 	}
 
 	// Called from native
 	@SuppressWarnings("unused")
-	final void addBone(int index, String name, float x, float y, float rotation, float scaleX, float scaleY) {
+	final void addBone(int index,
+	               String slotName,
+	               String boneName
+	) {
+
 		SpineBone bone = new SpineBone();
-		bone.name = name;
-		bone.attachment = nameLookup.get(name);
-		bone.x = x;
-		bone.y = y;
-		bone.rotation = rotation;
-		bone.scaleX = scaleX;
-		bone.scaleY = scaleY;
+
+		bone.name = boneName;
+
+		// Get the attachment from the slot
+		bone.attachment = slots.get(slotName);
+
 		bones[index] = bone;
+
 		if(initListener != null) {
 			initListener.onCreateBone(bone);
 		}
@@ -46,21 +64,53 @@ public class SpineAnimation {
 
 	// Called from native
 	@SuppressWarnings("unused")
-	final void onBoneStep(int index, float x, float y, float rotation, float scaleX, float scaleY) {
-		SpineBone bone = bones[index];
-		bone.x = x;
-		bone.y = y;
-		bone.rotation = rotation;
-		bone.scaleX = scaleX;
-		bone.scaleY = scaleY;
+	final FloatBuffer getVertices() {
+		return vertices;
+	}
 
-		if(animationListener != null) {
-			animationListener.onUpdate(bone);
-		}
+	// Called from native
+//	@SuppressWarnings("unused")
+//	final void onBoneStep(int index
+////			,
+////	                      float x,
+////	                      float y,
+////	                      float rotation,
+////	                      float scaleX,
+////	                      float scaleY,
+////	                      float worldX,
+////	                      float worldY,
+////	                      float worldRotation,
+////	                      float worldScaleX,
+////	                      float worldScaleY
+//	) {
+//		SpineBone bone = bones[index];
+//
+////		bone.vertices.position(0);
+////		bone.vertices.get(tmp);
+//
+////		bone.localSRT.x = x;
+////		bone.localSRT.y = y;
+////		bone.localSRT.rotation = rotation;
+////		bone.localSRT.scaleX = scaleX;
+////		bone.localSRT.scaleY = scaleY;
+////
+////		bone.worldSRT.x = worldX;
+////		bone.worldSRT.y = worldY;
+////		bone.worldSRT.rotation = worldRotation;
+////		bone.worldSRT.scaleX = worldScaleX;
+////		bone.worldSRT.scaleY = worldScaleY;
+//
+//		if(animationListener != null) {
+//			animationListener.onUpdate(bone);
+//		}
+//	}
+
+	public final void setXY(float x, float y) {
+		setXY(addr, x, y);
 	}
 
 	public final void step(long deltaTime) {
-		if(!destroyed) {
+		if(!destroyed && deltaTime > 0) {
 			step(addr, (float)deltaTime/1000.0f); // Spine steps in seconds.
 		}
 	}
@@ -87,6 +137,8 @@ public class SpineAnimation {
 	void setInitListener(SpineAnimationInitListener initListener) {
 		this.initListener = initListener;
 	}
+
+	native void setXY(long addr, float x, float y);
 
 	native void step(long addr, float deltaTime);
 

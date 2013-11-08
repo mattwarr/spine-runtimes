@@ -8,23 +8,28 @@
 				<externalSettings/>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.linuxtools.internal.cdt.autotools.core.ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration buildProperties="" id="com.android.toolchain.gcc.424465267" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
+				<configuration buildProperties="" description="" id="com.android.toolchain.gcc.424465267" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
 					<folderInfo id="com.android.toolchain.gcc.424465267.1515923132" name="/" resourcePath="">
-						<toolChain id="com.android.toolchain.gcc.2076444849" name="com.android.toolchain.gcc" superClass="com.android.toolchain.gcc">
-							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="com.android.targetPlatform.179410124" isAbstract="false" superClass="com.android.targetPlatform"/>
-							<builder id="com.android.builder.2012598011" managedBuildOn="false" name="Android Builder.Default" superClass="com.android.builder"/>
-							<tool id="com.android.gcc.compiler.197365888" name="Android GCC Compiler" superClass="com.android.gcc.compiler"/>
+						<toolChain id="com.android.toolchain.gcc.488444540" name="Android GCC" superClass="com.android.toolchain.gcc">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="com.android.targetPlatform.1236363207" isAbstract="false" superClass="com.android.targetPlatform"/>
+							<builder id="com.android.builder.969149308" managedBuildOn="false" name="Android Builder.Default" superClass="com.android.builder"/>
+							<tool id="com.android.gcc.compiler.67791383" name="Android GCC Compiler" superClass="com.android.gcc.compiler">
+								<option id="com.android.gcc.option.includePath.803763124" superClass="com.android.gcc.option.includePath" valueType="includePath">
+									<listOptionValue builtIn="false" value="/Applications/android-ndk-r9/sources/cxx-stl/stlport/stlport"/>
+								</option>
+								<inputType id="com.android.gcc.inputType.1759043029" superClass="com.android.gcc.inputType"/>
+							</tool>
 						</toolChain>
 					</folderInfo>
 				</configuration>
@@ -35,7 +40,13 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="spine-android.null.1622358733" name="spine-android"/>
 	</storageModule>
+	<storageModule moduleId="refreshScope" versionNumber="1">
+		<resource resourceType="PROJECT" workspacePath="/spine-android"/>
+	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.android.toolchain.gcc.424465267;com.android.toolchain.gcc.424465267.1515923132;com.android.gcc.compiler.197365888;com.android.gcc.inputType.2126402478">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.android.AndroidPerProjectProfile"/>
+		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

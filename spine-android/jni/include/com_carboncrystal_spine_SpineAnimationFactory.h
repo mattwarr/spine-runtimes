@@ -7,13 +7,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#undef com_carboncrystal_spine_SpineAnimationFactory_DEFAULT_BUFFER_SIZE
+#define com_carboncrystal_spine_SpineAnimationFactory_DEFAULT_BUFFER_SIZE 4096L
 /*
  * Class:     com_carboncrystal_spine_SpineAnimationFactory
  * Method:    create
  * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL Java_com_carboncrystal_spine_SpineAnimationFactory_create
-  (JNIEnv *, jobject, jstring);
+  (JNIEnv *, jobject, jstring, jstring);
 
 /*
  * Class:     com_carboncrystal_spine_SpineAnimationFactory

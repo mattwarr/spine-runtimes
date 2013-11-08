@@ -4,14 +4,14 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SpineAnimationFactory {
 	private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
@@ -20,12 +20,22 @@ public class SpineAnimationFactory {
 	private SpineAnimation[] animations;
 	private int createIndex = 0;
 	private final int size;
-	private final Map<String, String> nameLookup;
+	private final Map<String, SpineAttachment> slots;
 
-	public SpineAnimationFactory(Context context, String skeletonPath, int size) {
+	public SpineAnimationFactory(Context context, String atlasPath, String skeletonPath, int size) {
+		this(context, atlasPath, skeletonPath, null, size);
+	}
+
+	public SpineAnimationFactory(Context context, String atlasPath, String skeletonPath, String skin, int size) {
 
 		// We're not going to verify on the native side, so do it here
 		AssetManager am = context.getAssets();
+
+		if(!verifyPath(am, atlasPath)) {
+			throw new RuntimeException("Cannot create factory.  Atlas path [" +
+					atlasPath +
+					"] does not exist");
+		}
 
 		if(!verifyPath(am, skeletonPath)) {
 			throw new RuntimeException("Cannot create factory.  Skeleton path [" +
@@ -33,7 +43,8 @@ public class SpineAnimationFactory {
 					"] does not exist");
 		}
 
-		this.addr = create(skeletonPath);
+
+		this.addr = create(atlasPath, skeletonPath);
 
 		if(SpineContext.isNULL(this.addr)) {
 			throw new RuntimeException("Failed to create factory.  Check logs for error");
@@ -43,15 +54,50 @@ public class SpineAnimationFactory {
 		this.size = size;
 
 		// Create a local lookup for bone-to-attachment names
-		nameLookup = new HashMap<String, String>();
+		slots = new HashMap<String, SpineAttachment>();
 
 		// Load the asset file
 		try {
 			JSONObject jsonObject = new JSONObject(readAsset(am, skeletonPath));
+
 			JSONArray slots = jsonObject.getJSONArray("slots");
+
 			for (int i = 0; i < slots.length(); i++) {
+
 				JSONObject obj = slots.getJSONObject(i);
-				nameLookup.put(obj.getString("bone"), obj.getString("attachment"));
+				String name = obj.getString("attachment");
+				String slot = obj.getString("name");
+
+				SpineAttachment attachment = new SpineAttachment(name);
+
+				this.slots.put(slot, attachment);
+			}
+
+			JSONObject skins = jsonObject.getJSONObject("skins");
+
+			if(skin == null) {
+				skin = "default";
+			}
+
+			JSONObject skinObj = skins.getJSONObject(skin);
+
+			Iterator<String> slotNames = skinObj.keys();
+
+			while(slotNames.hasNext()) {
+				String slot = slotNames.next();
+
+				JSONObject slotData = skinObj.getJSONObject(slot);
+
+				SpineAttachment attachment = this.slots.get(slot);
+
+				JSONObject skinData = slotData.getJSONObject(attachment.name);
+
+				attachment.skin = new SpineSkin();
+				attachment.skin.x = getJSONFloat(skinData, "x");
+				attachment.skin.y = getJSONFloat(skinData, "y");
+				attachment.skin.rotation = getJSONFloat(skinData, "rotation");
+				attachment.skin.width = getJSONFloat(skinData, "width");
+				attachment.skin.height = getJSONFloat(skinData, "height");
 			}
 		}
 		catch (Exception e) {
@@ -59,12 +105,19 @@ public class SpineAnimationFactory {
 		}
 	}
 	public final SpineAnimation create() {
-		return create((SpineAnimationInitListener) null);
+		return create(null);
+	}
+
+	float getJSONFloat(JSONObject object, String key) throws JSONException {
+		if(object.has(key) && !object.isNull(key)) {
+			return (float) object.getDouble(key);
+		}
+		return 0.0f;
 	}
 
 	public final SpineAnimation create(SpineAnimationInitListener listener) {
 		if(createIndex < animations.length) {
-			SpineAnimation animation = new SpineAnimation(createIndex, nameLookup);
+			SpineAnimation animation = new SpineAnimation(createIndex, slots);
 			animation.setInitListener(listener);
 			animation.addr = createAnimation(addr, animation);
 			if(SpineContext.isNULL(animation.addr)) {
@@ -107,9 +160,6 @@ public class SpineAnimationFactory {
 		}
 	}
 
-	Map<String, String> getNameLookup() {
-		return nameLookup;
-	}
 
 	boolean verifyPath(AssetManager assets, String name) {
 		try {
@@ -143,7 +193,7 @@ public class SpineAnimationFactory {
 		return writer.toString();
 	}
 
-	native long create(String skeletonPath);
+	native long create(String atlasPath, String skeletonPath);
 
 	native long createAnimation(long addr, SpineAnimation callback);
 

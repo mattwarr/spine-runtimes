@@ -29,10 +29,20 @@ public:
 
 	void destroy(JNIEnv* env);
 
+	bool getBufferAddress(JNIEnv * env, jobject owner);
+
+	void setXY(float x, float y) {
+		this->x = x;
+		this->y = y;
+	}
+
 private:
 	spSkeleton* skeleton;
 	spAnimationState* state;
 	SpineCallback* callback;
+	float* vertices;
+	float x;
+	float y;
 };
 
 #endif /* SPINEANIMATION_H_ */

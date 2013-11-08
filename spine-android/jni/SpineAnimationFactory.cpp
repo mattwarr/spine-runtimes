@@ -12,14 +12,13 @@
 #include <spine/SkeletonJson.h>
 #include <android/log.h>
 
-SpineAnimationFactory::SpineAnimationFactory(const char* skeletonPath) {
+SpineAnimationFactory::SpineAnimationFactory(const char* atlasPath, const char* skeletonPath) {
 	int length;
 	this->error = false;
-	this->attachmentLoader =
-			(spAttachmentLoader*) spEmptyAttachmentLoader_create();
 
-	spSkeletonJson* skeletonJson = spSkeletonJson_createWithLoader(
-			this->attachmentLoader);
+	spAtlas* atlas = spAtlas_readAtlasFile(atlasPath);
+
+	spSkeletonJson* skeletonJson = spSkeletonJson_create(atlas);
 
 	const char* json = _spUtil_readFile(skeletonPath, &length);
 
@@ -31,6 +30,7 @@ SpineAnimationFactory::SpineAnimationFactory(const char* skeletonPath) {
 				"Error creating spSkeletonJson: %s", skeletonJson->error);
 	}
 
+	spAtlas_dispose(atlas);
 	spSkeletonJson_dispose(skeletonJson);
 	FREE(json);
 }
@@ -38,9 +38,6 @@ SpineAnimationFactory::SpineAnimationFactory(const char* skeletonPath) {
 SpineAnimationFactory::~SpineAnimationFactory() {
 	if (this->skeletonData != NULL) {
 		spSkeletonData_dispose(this->skeletonData);
-	}
-	if (this->attachmentLoader != NULL) {
-		spAttachmentLoader_dispose(this->attachmentLoader);
 	}
 }
 

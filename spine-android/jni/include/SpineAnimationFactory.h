@@ -15,7 +15,7 @@
 
 class SpineAnimationFactory {
 public:
-	SpineAnimationFactory(const char* skeletonPath);
+	SpineAnimationFactory(const char* atlasPath, const char* skeletonPath);
 	virtual ~SpineAnimationFactory();
 
 	SpineAnimation* create(JNIEnv* env, SpineCallback* cb);
@@ -26,7 +26,7 @@ public:
 
 private:
 	spSkeletonData* skeletonData;
-	spAttachmentLoader* attachmentLoader;
+//	spAttachmentLoader* attachmentLoader;
 	bool error;
 };
 

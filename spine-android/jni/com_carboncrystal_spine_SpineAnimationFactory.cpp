@@ -8,15 +8,17 @@
  * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL Java_com_carboncrystal_spine_SpineAnimationFactory_create
-  (JNIEnv *env, jobject caller, jstring skeletonPath) {
+  (JNIEnv *env, jobject caller, jstring atlasPath, jstring skeletonPath) {
+	const char* aPath = env->GetStringUTFChars(atlasPath, 0);
 	const char* sPath = env->GetStringUTFChars(skeletonPath, 0);
 
-	SpineAnimationFactory* factory = new SpineAnimationFactory(sPath);
+	SpineAnimationFactory* factory = new SpineAnimationFactory(aPath, sPath);
 
+	env->ReleaseStringUTFChars(skeletonPath, aPath);
 	env->ReleaseStringUTFChars(skeletonPath, sPath);
 
 	if(factory->inError()) {
-		return NULL;
+		return 0;
 	}
 
 	return (jlong) factory;

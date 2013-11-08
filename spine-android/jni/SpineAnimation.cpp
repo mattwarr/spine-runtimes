@@ -7,25 +7,35 @@
 
 #include <SpineAnimation.h>
 #include <SpineCallback.h>
+#include <spine/Slot.h>
+#include <android/log.h>
+
 
 SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* cb) {
 	this->callback = cb;
 	this->skeleton = spSkeleton_create(sd);
 	this->state = spAnimationState_create(spAnimationStateData_create(skeleton->data));
-	this->callback->onSkeletonCreate(env, skeleton->slotCount);
+
+	// This will allocate the native array
+	this->vertices = this->callback->onSkeletonCreate(env, skeleton->slotCount);
+
+	this->x = 0;
+	this->y = 0;
+
+	// TODO: Remove this
+	this->skeleton->flipY = 1;
 
 	int i;
+
 	// Update transform so the bone's world position is set
 	spSkeleton_updateWorldTransform(skeleton);
+
 	for(i = 0; i < skeleton->slotCount; i++) {
-		spBone* data = skeleton->slots[i]->bone;
-		this->callback->addBone(env, i,
-				data->data->name,
-				data->worldX,
-				data->worldY,
-				data->worldRotation,
-				data->worldScaleX,
-				data->worldScaleY);
+		spSlot* slot = skeleton->drawOrder[i];
+		this->callback->addBone(
+				env,
+				i,
+				slot);
 	}
 }
 
@@ -59,19 +69,19 @@ void SpineAnimation::step(JNIEnv* env, float deltaTime) {
 	spAnimationState_apply(state, skeleton);
 	spSkeleton_updateWorldTransform(skeleton);
 
-	int i;
+	int i, bufferIndex = 0;
+
 	for(i = 0; i < skeleton->slotCount; i++) {
 
-		spBone* data = skeleton->slots[i]->bone;
+		spSlot* slot = skeleton->drawOrder[i];
 
-		callback->onBoneStep(
-				env,
-				i,
-				data->worldX,
-				data->worldY,
-				data->worldRotation,
-				data->worldScaleX,
-				data->worldScaleY);
+		spBone* bone = slot->bone;
+
+		bufferIndex = i * 8; // 4x2 vert coords
+
+		float* buffer = &vertices[bufferIndex];
+
+		spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, buffer);
 	}
 }
 
@@ -87,6 +97,7 @@ void SpineAnimation::destroy(JNIEnv* env) {
 	this->callback->destroy(env);
 
 	delete this->callback;
+	delete this->vertices;
 }
 
 SpineAnimation::~SpineAnimation() {}
