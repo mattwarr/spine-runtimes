@@ -81,10 +81,10 @@ public class SpineAnimationFactory {
 
 			JSONObject skinObj = skins.getJSONObject(skin);
 
-			Iterator<String> slotNames = skinObj.keys();
+			Iterator<?> slotNames = skinObj.keys();
 
 			while(slotNames.hasNext()) {
-				String slot = slotNames.next();
+				String slot = slotNames.next().toString();
 
 				JSONObject slotData = skinObj.getJSONObject(slot);
 
@@ -115,7 +115,7 @@ public class SpineAnimationFactory {
 		return 0.0f;
 	}
 
-	public final SpineAnimation create(SpineAnimationInitListener listener) {
+	public final SpineAnimation create(SpineAnimationListener listener) {
 		if(createIndex < animations.length) {
 			SpineAnimation animation = new SpineAnimation(createIndex, slots);
 			animation.setInitListener(listener);

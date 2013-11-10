@@ -12,10 +12,9 @@ public class SpineAnimation {
 	public SpineBone[] bones;
 
 	private SpineAnimationListener animationListener;
-	private SpineAnimationInitListener initListener;
+	private SpineAnimationListener initListener;
 
 	private final Map<String, SpineAttachment> slots;
-
 
 	static final int BYTES_PER_FLOAT = 4;
 	static final int FLOATS_PER_BONE = 8;
@@ -45,8 +44,7 @@ public class SpineAnimation {
 	@SuppressWarnings("unused")
 	final void addBone(int index,
 	               String slotName,
-	               String boneName
-	) {
+	               String boneName) {
 
 		SpineBone bone = new SpineBone();
 
@@ -67,43 +65,6 @@ public class SpineAnimation {
 	final FloatBuffer getVertices() {
 		return vertices;
 	}
-
-	// Called from native
-//	@SuppressWarnings("unused")
-//	final void onBoneStep(int index
-////			,
-////	                      float x,
-////	                      float y,
-////	                      float rotation,
-////	                      float scaleX,
-////	                      float scaleY,
-////	                      float worldX,
-////	                      float worldY,
-////	                      float worldRotation,
-////	                      float worldScaleX,
-////	                      float worldScaleY
-//	) {
-//		SpineBone bone = bones[index];
-//
-////		bone.vertices.position(0);
-////		bone.vertices.get(tmp);
-//
-////		bone.localSRT.x = x;
-////		bone.localSRT.y = y;
-////		bone.localSRT.rotation = rotation;
-////		bone.localSRT.scaleX = scaleX;
-////		bone.localSRT.scaleY = scaleY;
-////
-////		bone.worldSRT.x = worldX;
-////		bone.worldSRT.y = worldY;
-////		bone.worldSRT.rotation = worldRotation;
-////		bone.worldSRT.scaleX = worldScaleX;
-////		bone.worldSRT.scaleY = worldScaleY;
-//
-//		if(animationListener != null) {
-//			animationListener.onUpdate(bone);
-//		}
-//	}
 
 	public final void setXY(float x, float y) {
 		setXY(addr, x, y);
@@ -134,7 +95,7 @@ public class SpineAnimation {
 		this.animationListener = animationListener;
 	}
 
-	void setInitListener(SpineAnimationInitListener initListener) {
+	void setInitListener(SpineAnimationListener initListener) {
 		this.initListener = initListener;
 	}
 
