@@ -1,5 +1,6 @@
 package com.carboncrystal.spine;
 
+@Deprecated
 public class SpineSkin {
 	public float x;
 	public float y;

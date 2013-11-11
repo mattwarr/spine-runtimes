@@ -56,49 +56,46 @@ public class SpineAnimationFactory {
 		// Create a local lookup for bone-to-attachment names
 		slots = new HashMap<String, SpineAttachment>();
 
-		// Load the asset file
+		// Load the asset file to get the names of the bones
 		try {
 			JSONObject jsonObject = new JSONObject(readAsset(am, skeletonPath));
 
 			JSONArray slots = jsonObject.getJSONArray("slots");
 
 			for (int i = 0; i < slots.length(); i++) {
-
 				JSONObject obj = slots.getJSONObject(i);
 				String name = obj.getString("attachment");
 				String slot = obj.getString("name");
-
 				SpineAttachment attachment = new SpineAttachment(name);
-
 				this.slots.put(slot, attachment);
 			}
-
-			JSONObject skins = jsonObject.getJSONObject("skins");
-
-			if(skin == null) {
-				skin = "default";
-			}
-
-			JSONObject skinObj = skins.getJSONObject(skin);
-
-			Iterator<?> slotNames = skinObj.keys();
-
-			while(slotNames.hasNext()) {
-				String slot = slotNames.next().toString();
-
-				JSONObject slotData = skinObj.getJSONObject(slot);
-
-				SpineAttachment attachment = this.slots.get(slot);
-
-				JSONObject skinData = slotData.getJSONObject(attachment.name);
-
-				attachment.skin = new SpineSkin();
-				attachment.skin.x = getJSONFloat(skinData, "x");
-				attachment.skin.y = getJSONFloat(skinData, "y");
-				attachment.skin.rotation = getJSONFloat(skinData, "rotation");
-				attachment.skin.width = getJSONFloat(skinData, "width");
-				attachment.skin.height = getJSONFloat(skinData, "height");
-			}
+//
+//			JSONObject skins = jsonObject.getJSONObject("skins");
+//
+//			if(skin == null) {
+//				skin = "default";
+//			}
+//
+//			JSONObject skinObj = skins.getJSONObject(skin);
+//
+//			Iterator<?> slotNames = skinObj.keys();
+//
+//			while(slotNames.hasNext()) {
+//				String slot = slotNames.next().toString();
+//
+//				JSONObject slotData = skinObj.getJSONObject(slot);
+//
+//				SpineAttachment attachment = this.slots.get(slot);
+//
+//				JSONObject skinData = slotData.getJSONObject(attachment.name);
+//
+//				attachment.skin = new SpineSkin();
+//				attachment.skin.x = getJSONFloat(skinData, "x");
+//				attachment.skin.y = getJSONFloat(skinData, "y");
+//				attachment.skin.rotation = getJSONFloat(skinData, "rotation");
+//				attachment.skin.width = getJSONFloat(skinData, "width");
+//				attachment.skin.height = getJSONFloat(skinData, "height");
+//			}
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to create factory", e);
@@ -108,17 +105,17 @@ public class SpineAnimationFactory {
 		return create(null);
 	}
 
-	float getJSONFloat(JSONObject object, String key) throws JSONException {
-		if(object.has(key) && !object.isNull(key)) {
-			return (float) object.getDouble(key);
-		}
-		return 0.0f;
-	}
+//	float getJSONFloat(JSONObject object, String key) throws JSONException {
+//		if(object.has(key) && !object.isNull(key)) {
+//			return (float) object.getDouble(key);
+//		}
+//		return 0.0f;
+//	}
 
 	public final SpineAnimation create(SpineAnimationListener listener) {
 		if(createIndex < animations.length) {
 			SpineAnimation animation = new SpineAnimation(createIndex, slots);
-			animation.setInitListener(listener);
+			animation.setAnimationListener(listener);
 			animation.addr = createAnimation(addr, animation);
 			if(SpineContext.isNULL(animation.addr)) {
 				throw new RuntimeException("Error creating animation.  Check native logs");

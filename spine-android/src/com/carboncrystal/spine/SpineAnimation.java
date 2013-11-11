@@ -12,7 +12,6 @@ public class SpineAnimation {
 	public SpineBone[] bones;
 
 	private SpineAnimationListener animationListener;
-	private SpineAnimationListener initListener;
 
 	private final Map<String, SpineAttachment> slots;
 
@@ -55,8 +54,8 @@ public class SpineAnimation {
 
 		bones[index] = bone;
 
-		if(initListener != null) {
-			initListener.onCreateBone(bone);
+		if(animationListener != null) {
+			animationListener.onCreateBone(bone);
 		}
 	}
 
@@ -91,12 +90,8 @@ public class SpineAnimation {
 		}
 	}
 
-	public void setAnimationListener(SpineAnimationListener animationListener) {
+	void setAnimationListener(SpineAnimationListener animationListener) {
 		this.animationListener = animationListener;
-	}
-
-	void setInitListener(SpineAnimationListener initListener) {
-		this.initListener = initListener;
 	}
 
 	native void setXY(long addr, float x, float y);
