@@ -13,13 +13,23 @@
 
 #include <map>
 
+const char* const LOG_TAG = "SpineAndroid";
+
 class SpineCallback {
 
 public:
 	SpineCallback(JNIEnv* env, jobject jCallback);
 	virtual ~SpineCallback();
 
-	float* onSkeletonCreate(JNIEnv* env, int numBones);
+	void onSkeletonCreate(JNIEnv* env, int numBones);
+
+	float* getVertexBuffer(JNIEnv* env);
+
+	int getBufferOffset(JNIEnv* env);
+
+	int getStride(JNIEnv* env);
+
+	int getDrawMode(JNIEnv* env);
 
 	void addBone(JNIEnv* env, int index, spSlot* slot);
 
@@ -30,9 +40,12 @@ public:
 private:
 	jobject jCallback;
 	jclass callbackClass;
-//	jmethodID stepBoneID;
 	jmethodID onCreateID;
 	jmethodID addBoneID;
+	jmethodID getVertexBufferID;
+	jmethodID getStrideID;
+	jmethodID getDrawModeID;
+	jmethodID getBufferOffsetID;
 	std::map<const char*, int> boneMapping;
 };
 

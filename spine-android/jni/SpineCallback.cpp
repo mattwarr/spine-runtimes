@@ -12,13 +12,15 @@
 #include <spine/spine.h>
 #include <stdlib.h>
 
-const char* LOG_TAG = "SpineAndroid";
-
 SpineCallback::SpineCallback(JNIEnv* env, jobject jCallback) {
 	this->jCallback = env->NewGlobalRef(jCallback);
 	callbackClass = env->FindClass("com/carboncrystal/spine/SpineAnimation");
-	onCreateID = env->GetMethodID(callbackClass, "onSkeletonCreate", "(I)Ljava/nio/FloatBuffer;");
+	onCreateID = env->GetMethodID(callbackClass, "onSkeletonCreate", "(I)V");
 	addBoneID = env->GetMethodID(callbackClass, "addBone", "(ILjava/lang/String;Ljava/lang/String;)V");
+	getVertexBufferID = env->GetMethodID(callbackClass, "getVertexBuffer", "()Ljava/nio/FloatBuffer;");
+	getStrideID = env->GetMethodID(callbackClass, "getStride", "()I");
+	getDrawModeID = env->GetMethodID(callbackClass, "getDrawMode", "()I");
+	getBufferOffsetID = env->GetMethodID(callbackClass, "getBufferOffset", "()I");
 }
 
 SpineCallback::~SpineCallback() {}
@@ -27,9 +29,25 @@ void SpineCallback::destroy(JNIEnv* env) {
 	env->DeleteGlobalRef(jCallback);
 }
 
-float* SpineCallback::onSkeletonCreate(JNIEnv* env, int numBones) {
-	jobject verts = env->CallObjectMethod(jCallback, onCreateID, numBones);
+void SpineCallback::onSkeletonCreate(JNIEnv* env, int numBones) {
+	env->CallVoidMethod(jCallback, onCreateID, numBones);
+}
+
+float* SpineCallback::getVertexBuffer(JNIEnv* env) {
+	jobject verts = env->CallObjectMethod(jCallback, getVertexBufferID);
 	return (float*) env->GetDirectBufferAddress(verts);
+}
+
+int SpineCallback::getBufferOffset(JNIEnv* env) {
+	return (int) env->CallIntMethod(jCallback, getBufferOffsetID);
+}
+
+int SpineCallback::getStride(JNIEnv* env) {
+	return (int) env->CallIntMethod(jCallback, getStrideID);
+}
+
+int SpineCallback::getDrawMode(JNIEnv* env) {
+	return (int) env->CallIntMethod(jCallback, getDrawModeID);
 }
 
 void SpineCallback::addBone(JNIEnv* env,

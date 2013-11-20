@@ -1,7 +1,5 @@
 package com.carboncrystal.spine;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Map;
 
@@ -11,32 +9,85 @@ public class SpineAnimation {
 
 	public SpineBone[] bones;
 
+	public int size;
+
 	private SpineAnimationListener animationListener;
 
 	private final Map<String, SpineAttachment> slots;
 
-	static final int BYTES_PER_FLOAT = 4;
-	static final int FLOATS_PER_BONE = 8;
+	private FloatBuffer vertices;
+	private int stride;
+	private int offset;
+	private int drawMode;
 
-	public FloatBuffer vertices;
+	private final SpineVertexBufferInfo vertexBufferInfo;
+
+	//	private final int drawMode = GLES20.GL_TRIANGLES;
 
 	long addr;
 	boolean destroyed = false;
 
-	SpineAnimation(int index, Map<String, SpineAttachment> slots) {
+	SpineAnimation(int index, Map<String, SpineAttachment> slots, SpineVertexBufferInfo vertexBufferInfo) {
 		this.index = index;
 		this.slots = slots;
+		this.vertexBufferInfo = vertexBufferInfo;
 	}
 
 	// Called from native
 	@SuppressWarnings("unused")
-	final FloatBuffer onSkeletonCreate(int numBones) {
-		bones = new SpineBone[numBones];
+	final void onSkeletonCreate(int numBones) {
+		this.bones = new SpineBone[numBones];
+		this.size = numBones;
 
-		// Allocate the native buffer
-		vertices = ByteBuffer.allocateDirect(BYTES_PER_FLOAT * FLOATS_PER_BONE * numBones).order(ByteOrder.nativeOrder()).asFloatBuffer();
+		if(animationListener != null) {
+			animationListener.onCreateSkeleton(bones);
+		}
 
+		this.vertices = vertexBufferInfo.getVertexBuffer();
+		this.stride = vertexBufferInfo.getStride();
+		this.offset = vertexBufferInfo.getOffset();
+		this.drawMode = vertexBufferInfo.getDrawMode();
+	}
+
+	/**
+	 * Returns the buffer into which attachment vertices will be written.
+	 * CALLED FROM NATIVE CODE.
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	public final FloatBuffer getVertexBuffer() {
 		return vertices;
+	}
+
+	/**
+	 * Returns the "stride" (distance in the buffer between successive attachments)
+	 * CALLED FROM NATIVE CODE.
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	public final int getStride() {
+		return stride;
+	}
+
+	/**
+	 * Returns the GL draw mode.  The QUAD vertices for each attachment will be converted into GL coordinates based on
+	 * the draw mode (eg GL_TRIANGLES).
+	 * CALLED FROM NATIVE CODE.
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	public final int getDrawMode() {
+		return drawMode;
+	}
+
+	/**
+	 * Returns the offset into the buffer that this animation will start writing floats.
+	 * CALLED FROM NATIVE CODE.
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	public final int getBufferOffset() {
+		return offset;
 	}
 
 	// Called from native
@@ -57,12 +108,6 @@ public class SpineAnimation {
 		if(animationListener != null) {
 			animationListener.onCreateBone(bone);
 		}
-	}
-
-	// Called from native
-	@SuppressWarnings("unused")
-	final FloatBuffer getVertices() {
-		return vertices;
 	}
 
 	public final void setXY(float x, float y) {

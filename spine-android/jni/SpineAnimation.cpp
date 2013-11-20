@@ -9,7 +9,7 @@
 #include <SpineCallback.h>
 #include <spine/Slot.h>
 #include <android/log.h>
-
+#include <GLTrianglesVertexTranslator.h>
 
 SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* cb) {
 	this->callback = cb;
@@ -17,7 +17,22 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 	this->state = spAnimationState_create(spAnimationStateData_create(skeleton->data));
 
 	// This will allocate the native array
-	this->vertices = this->callback->onSkeletonCreate(env, skeleton->slotCount);
+	this->callback->onSkeletonCreate(env, skeleton->slotCount);
+
+	this->vertices = this->callback->getVertexBuffer(env);
+	this->stride = this->callback->getStride(env);
+	this->offset = this->callback->getBufferOffset(env);
+	this->drawMode = this->callback->getDrawMode(env);
+	this->buffer = new float[8]; // 4x2 vert coords
+
+	switch(this->drawMode) {
+
+	this->translator = NULL;
+
+	case GL_TRIANGLES:
+		this->translator = new GLTrianglesVertexTranslator();
+		break;
+	}
 
 	this->x = 0;
 	this->y = 0;
@@ -69,7 +84,7 @@ void SpineAnimation::step(JNIEnv* env, float deltaTime) {
 	spAnimationState_apply(state, skeleton);
 	spSkeleton_updateWorldTransform(skeleton);
 
-	int i, bufferIndex = 0;
+	int i, bufferIndex = this->offset;
 
 	for(i = 0; i < skeleton->slotCount; i++) {
 
@@ -77,11 +92,17 @@ void SpineAnimation::step(JNIEnv* env, float deltaTime) {
 
 		spBone* bone = slot->bone;
 
-		bufferIndex = i * 8; // 4x2 vert coords
+		// Read the verts into the temp buffer
+		spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, this->buffer);
 
-		float* buffer = &vertices[bufferIndex];
-
-		spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, buffer);
+		// translate the tmp buffer into the output buffer.
+		if(this->translator) {
+			bufferIndex += this->translator->translate(this->buffer, this->vertices, bufferIndex, this->stride);
+		}
+		else {
+			__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "No vertex translator defined!");
+			break;
+		}
 	}
 }
 
@@ -98,6 +119,11 @@ void SpineAnimation::destroy(JNIEnv* env) {
 
 	delete this->callback;
 	delete this->vertices;
+	delete this->buffer;
+
+	if(this->translator) {
+		delete this->translator;
+	}
 }
 
 SpineAnimation::~SpineAnimation() {}

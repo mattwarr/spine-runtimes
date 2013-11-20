@@ -101,8 +101,8 @@ public class SpineAnimationFactory {
 			throw new RuntimeException("Failed to create factory", e);
 		}
 	}
-	public final SpineAnimation create() {
-		return create(null);
+	public final SpineAnimation create(SpineVertexBufferInfo vertexBufferInfo) {
+		return create(null, vertexBufferInfo);
 	}
 
 //	float getJSONFloat(JSONObject object, String key) throws JSONException {
@@ -112,9 +112,9 @@ public class SpineAnimationFactory {
 //		return 0.0f;
 //	}
 
-	public final SpineAnimation create(SpineAnimationListener listener) {
+	public final SpineAnimation create(SpineAnimationListener listener, SpineVertexBufferInfo vertexBufferInfo) {
 		if(createIndex < animations.length) {
-			SpineAnimation animation = new SpineAnimation(createIndex, slots);
+			SpineAnimation animation = new SpineAnimation(createIndex, slots, vertexBufferInfo);
 			animation.setAnimationListener(listener);
 			animation.addr = createAnimation(addr, animation);
 			if(SpineContext.isNULL(animation.addr)) {

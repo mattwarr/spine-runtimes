@@ -13,6 +13,17 @@
 #include <android/asset_manager.h>
 #include <spine/spine.h>
 #include <SpineCallback.h>
+#include <VertexTranslator.h>
+
+
+// Correspond to android.opengl.GLES20 statics
+#define GL_POINTS 			0
+#define GL_LINES 			1
+#define GL_LINE_LOOP 		2
+#define GL_LINE_STRIP 		3
+#define GL_TRIANGLES 		4
+#define GL_TRIANGLE_STRIP 	5
+#define GL_TRIANGLE_FAN 	6
 
 class SpineAnimation {
 
@@ -40,7 +51,12 @@ private:
 	spSkeleton* skeleton;
 	spAnimationState* state;
 	SpineCallback* callback;
+	VertexTranslator* translator;
 	float* vertices;
+	float* buffer;
+	int offset;
+	int stride;
+	int drawMode;
 	float x;
 	float y;
 };
