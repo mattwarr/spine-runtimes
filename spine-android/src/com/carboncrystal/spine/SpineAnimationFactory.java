@@ -23,10 +23,6 @@ public class SpineAnimationFactory {
 	private final Map<String, SpineAttachment> slots;
 
 	public SpineAnimationFactory(Context context, String atlasPath, String skeletonPath, int size) {
-		this(context, atlasPath, skeletonPath, null, size);
-	}
-
-	public SpineAnimationFactory(Context context, String atlasPath, String skeletonPath, String skin, int size) {
 
 		// We're not going to verify on the native side, so do it here
 		AssetManager am = context.getAssets();
@@ -69,33 +65,6 @@ public class SpineAnimationFactory {
 				SpineAttachment attachment = new SpineAttachment(name);
 				this.slots.put(slot, attachment);
 			}
-//
-//			JSONObject skins = jsonObject.getJSONObject("skins");
-//
-//			if(skin == null) {
-//				skin = "default";
-//			}
-//
-//			JSONObject skinObj = skins.getJSONObject(skin);
-//
-//			Iterator<?> slotNames = skinObj.keys();
-//
-//			while(slotNames.hasNext()) {
-//				String slot = slotNames.next().toString();
-//
-//				JSONObject slotData = skinObj.getJSONObject(slot);
-//
-//				SpineAttachment attachment = this.slots.get(slot);
-//
-//				JSONObject skinData = slotData.getJSONObject(attachment.name);
-//
-//				attachment.skin = new SpineSkin();
-//				attachment.skin.x = getJSONFloat(skinData, "x");
-//				attachment.skin.y = getJSONFloat(skinData, "y");
-//				attachment.skin.rotation = getJSONFloat(skinData, "rotation");
-//				attachment.skin.width = getJSONFloat(skinData, "width");
-//				attachment.skin.height = getJSONFloat(skinData, "height");
-//			}
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to create factory", e);
@@ -104,13 +73,6 @@ public class SpineAnimationFactory {
 	public final SpineAnimation create(SpineVertexBufferInfo vertexBufferInfo) {
 		return create(null, vertexBufferInfo);
 	}
-
-//	float getJSONFloat(JSONObject object, String key) throws JSONException {
-//		if(object.has(key) && !object.isNull(key)) {
-//			return (float) object.getDouble(key);
-//		}
-//		return 0.0f;
-//	}
 
 	public final SpineAnimation create(SpineAnimationListener listener, SpineVertexBufferInfo vertexBufferInfo) {
 		if(createIndex < animations.length) {

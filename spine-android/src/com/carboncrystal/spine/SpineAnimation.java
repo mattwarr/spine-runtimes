@@ -9,7 +9,7 @@ public class SpineAnimation {
 
 	public SpineBone[] bones;
 
-	public int size;
+	public int numBones;
 
 	private SpineAnimationListener animationListener;
 
@@ -22,9 +22,8 @@ public class SpineAnimation {
 
 	private final SpineVertexBufferInfo vertexBufferInfo;
 
-	//	private final int drawMode = GLES20.GL_TRIANGLES;
-
 	long addr;
+
 	boolean destroyed = false;
 
 	SpineAnimation(int index, Map<String, SpineAttachment> slots, SpineVertexBufferInfo vertexBufferInfo) {
@@ -37,10 +36,10 @@ public class SpineAnimation {
 	@SuppressWarnings("unused")
 	final void onSkeletonCreate(int numBones) {
 		this.bones = new SpineBone[numBones];
-		this.size = numBones;
+		this.numBones = numBones;
 
 		if(animationListener != null) {
-			animationListener.onCreateSkeleton(bones);
+			animationListener.onCreateSkeleton(numBones);
 		}
 
 		this.vertices = vertexBufferInfo.getVertexBuffer();

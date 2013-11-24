@@ -7,7 +7,7 @@ rendering engines and simply allowed me to load and run an animation from spine 
 
 This implementation leverages the spine-c implementation and provides a simple JNI wrapper for use in Android.
 
-The JSON file produced by spline simply needs to be placed in the **assets** folder of your android app.
+The JSON files produced by spline simply needs to be placed in the **assets** folder of your android app.
 
  .. note::
 
@@ -29,11 +29,41 @@ Init the context ::
 
 Create a factory (number of animations must be specified) ::
 
-	SpineAnimationFactory factory = new SpineAnimationFactory(this, "spineboy.json", 1);
+	SpineAnimationFactory factory = new SpineAnimationFactory(this, "spineboy.atlas", "spineboy.json", 1);
 
-Create an animation::
 
-	SpineAnimation animation = factory.create();
+Animation data is written to a native buffer, so we need to allocate a buffer and specify the offset/stride.
+We do this via a listener so we know how many bones are in the animation::
+
+    final BasicSpineVertexBufferInfo vbi = new BasicSpineVertexBufferInfo();
+
+    static final int BYTES_PER_FLOAT = 4;
+	static final int FLOATS_PER_BONE = 12; // 6 x 2 coords for GL_TRIANGLES
+
+    SpineAnimationListener listener = new SpineAnimationListener() {
+        @Override
+        public void onCreateBone(SpineBone bone) {
+            // This will be called for every bone created
+        }
+
+        @Override
+        public void onCreateSkeleton(int numBones) {
+
+            // Set the draw mode, offset and stride for this animation
+            // NOTE: Only GL_TRIANGLES is currently supported.
+
+            vbi.setDrawMode(GLES20.GL_TRIANGLES);
+            vbi.setOffset(0);
+            vbi.setStride(0);
+
+            // Allocate a native buffer
+            vbi.setVertexBuffer(ByteBuffer.allocateDirect(BYTES_PER_FLOAT * FLOATS_PER_BONE * numBones).order(ByteOrder.nativeOrder()).asFloatBuffer());
+        }
+    };
+
+Now we can create the animation with the vertex buffer info::
+
+	SpineAnimation animation = factory.create(listener, vbi);
 
 Set the animation and track::
 
@@ -42,15 +72,6 @@ Set the animation and track::
 Optionally add an animation to the track::
 
     animation.addAnimation(0, "walk", true, 0);
-
-Optionally add a listener::
-
-    animation.setAnimationListener(new SpineAnimationListener() {
-        @Override
-        public void onUpdate(SpineBone bone) {
-            // Called for each bone during step
-        }
-    });
 
 Step the animation::
 
@@ -64,4 +85,4 @@ Get the bone data::
 
 On destroy clean up::
 
-    animation.destroy();
+    factory.destroy();
