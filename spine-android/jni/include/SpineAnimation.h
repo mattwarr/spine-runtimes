@@ -40,6 +40,8 @@ public:
 
 	void destroy(JNIEnv* env);
 
+	void init(JNIEnv* env);
+
 	bool getBufferAddress(JNIEnv * env, jobject owner);
 
 	void setXY(float x, float y) {

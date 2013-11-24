@@ -7,10 +7,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#undef com_carboncrystal_spine_SpineAnimation_BYTES_PER_FLOAT
-#define com_carboncrystal_spine_SpineAnimation_BYTES_PER_FLOAT 4L
-#undef com_carboncrystal_spine_SpineAnimation_FLOATS_PER_BONE
-#define com_carboncrystal_spine_SpineAnimation_FLOATS_PER_BONE 8L
 /*
  * Class:     com_carboncrystal_spine_SpineAnimation
  * Method:    setXY
@@ -33,6 +29,14 @@ JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_step
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_destroy
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     com_carboncrystal_spine_SpineAnimation
+ * Method:    init
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_init
   (JNIEnv *, jobject, jlong);
 
 /*

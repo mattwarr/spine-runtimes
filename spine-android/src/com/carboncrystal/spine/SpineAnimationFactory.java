@@ -4,14 +4,14 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SpineAnimationFactory {
 	private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
@@ -70,13 +70,13 @@ public class SpineAnimationFactory {
 			throw new RuntimeException("Failed to create factory", e);
 		}
 	}
-	public final SpineAnimation create(SpineVertexBufferInfo vertexBufferInfo) {
-		return create(null, vertexBufferInfo);
+	public final SpineAnimation create() {
+		return create(null);
 	}
 
-	public final SpineAnimation create(SpineAnimationListener listener, SpineVertexBufferInfo vertexBufferInfo) {
+	public final SpineAnimation create(SpineAnimationListener listener) {
 		if(createIndex < animations.length) {
-			SpineAnimation animation = new SpineAnimation(createIndex, slots, vertexBufferInfo);
+			SpineAnimation animation = new SpineAnimation(createIndex, slots);
 			animation.setAnimationListener(listener);
 			animation.addr = createAnimation(addr, animation);
 			if(SpineContext.isNULL(animation.addr)) {

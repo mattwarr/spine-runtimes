@@ -35,7 +35,12 @@ void SpineCallback::onSkeletonCreate(JNIEnv* env, int numBones) {
 
 float* SpineCallback::getVertexBuffer(JNIEnv* env) {
 	jobject verts = env->CallObjectMethod(jCallback, getVertexBufferID);
-	return (float*) env->GetDirectBufferAddress(verts);
+
+	if(verts) {
+		return (float*) env->GetDirectBufferAddress(verts);
+	}
+
+	return NULL;
 }
 
 int SpineCallback::getBufferOffset(JNIEnv* env) {

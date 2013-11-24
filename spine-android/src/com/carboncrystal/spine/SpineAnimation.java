@@ -1,5 +1,7 @@
 package com.carboncrystal.spine;
 
+import android.opengl.GLES20;
+
 import java.nio.FloatBuffer;
 import java.util.Map;
 
@@ -15,21 +17,15 @@ public class SpineAnimation {
 
 	private final Map<String, SpineAttachment> slots;
 
-	private FloatBuffer vertices;
-	private int stride;
-	private int offset;
-	private int drawMode;
-
-	private final SpineVertexBufferInfo vertexBufferInfo;
+	private SpineVertexBufferInfo vertexBufferInfo;
 
 	long addr;
 
 	boolean destroyed = false;
 
-	SpineAnimation(int index, Map<String, SpineAttachment> slots, SpineVertexBufferInfo vertexBufferInfo) {
+	SpineAnimation(int index, Map<String, SpineAttachment> slots) {
 		this.index = index;
 		this.slots = slots;
-		this.vertexBufferInfo = vertexBufferInfo;
 	}
 
 	// Called from native
@@ -41,11 +37,15 @@ public class SpineAnimation {
 		if(animationListener != null) {
 			animationListener.onCreateSkeleton(numBones);
 		}
+	}
 
-		this.vertices = vertexBufferInfo.getVertexBuffer();
-		this.stride = vertexBufferInfo.getStride();
-		this.offset = vertexBufferInfo.getOffset();
-		this.drawMode = vertexBufferInfo.getDrawMode();
+	public void setSpineVertexBufferInfo(SpineVertexBufferInfo vertexBufferInfo) {
+		this.vertexBufferInfo = vertexBufferInfo;
+		init(addr);
+	}
+
+	public SpineVertexBufferInfo getVertexBufferInfo() {
+		return vertexBufferInfo;
 	}
 
 	/**
@@ -54,8 +54,8 @@ public class SpineAnimation {
 	 * @return
 	 */
 	@SuppressWarnings("unused")
-	public final FloatBuffer getVertexBuffer() {
-		return vertices;
+	final FloatBuffer getVertexBuffer() {
+		return (vertexBufferInfo == null) ? null : vertexBufferInfo.getVertexBuffer();
 	}
 
 	/**
@@ -64,8 +64,8 @@ public class SpineAnimation {
 	 * @return
 	 */
 	@SuppressWarnings("unused")
-	public final int getStride() {
-		return stride;
+	final int getStride() {
+		return (vertexBufferInfo == null) ? 0 : vertexBufferInfo.getStride();
 	}
 
 	/**
@@ -75,8 +75,8 @@ public class SpineAnimation {
 	 * @return
 	 */
 	@SuppressWarnings("unused")
-	public final int getDrawMode() {
-		return drawMode;
+	final int getDrawMode() {
+		return (vertexBufferInfo == null) ? GLES20.GL_TRIANGLES : vertexBufferInfo.getDrawMode();
 	}
 
 	/**
@@ -85,8 +85,8 @@ public class SpineAnimation {
 	 * @return
 	 */
 	@SuppressWarnings("unused")
-	public final int getBufferOffset() {
-		return offset;
+	final int getBufferOffset() {
+		return (vertexBufferInfo == null) ? 0 : vertexBufferInfo.getOffset();
 	}
 
 	// Called from native
@@ -143,6 +143,8 @@ public class SpineAnimation {
 	native void step(long addr, float deltaTime);
 
 	native void destroy(long addr);
+
+	native void init(long addr);
 
 	native boolean setAnimation(long addr, int trackIndex, String name, boolean loop);
 

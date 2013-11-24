@@ -29,39 +29,23 @@ Create a factory (number of animations must be specified) ::
 
 	SpineAnimationFactory factory = new SpineAnimationFactory(this, "spineboy.atlas", "spineboy.json", 1);
 
+Now we can create the animation::
 
-Animation data is written to a native buffer, so we need to allocate a buffer and specify the offset/stride.
-We do this via a listener so we know how many bones are in the animation::
+	SpineAnimation animation = factory.create();
 
-    final BasicSpineVertexBufferInfo vbi = new BasicSpineVertexBufferInfo();
+Animation data is written to a native buffer, so we need to allocate a buffer and specify the offset/stride::
 
-    static final int BYTES_PER_FLOAT = 4;
-    static final int FLOATS_PER_BONE = 12; // 6 x 2 coords for GL_TRIANGLES
+	final int BYTES_PER_FLOAT = 4;
+	final int FLOATS_PER_BONE = 12; // 6 x 2 coords for GL_TRIANGLES
 
-    SpineAnimationListener listener = new SpineAnimationListener() {
-        @Override
-        public void onCreateBone(SpineBone bone) {
-            // This will be called for every bone created
-        }
+    BasicSpineVertexBufferInfo vbi = new BasicSpineVertexBufferInfo();
+    vbi.setDrawMode(GLES20.GL_TRIANGLES);
+    vbi.setOffset(0);
+    vbi.setStride(0);
 
-        @Override
-        public void onCreateSkeleton(int numBones) {
+    vbi.setVertexBuffer(ByteBuffer.allocateDirect(BYTES_PER_FLOAT * FLOATS_PER_BONE * animation.numBones).order(ByteOrder.nativeOrder()).asFloatBuffer());
 
-            // Set the draw mode, offset and stride for this animation
-            // NOTE: Only GL_TRIANGLES is currently supported.
-
-            vbi.setDrawMode(GLES20.GL_TRIANGLES);
-            vbi.setOffset(0);
-            vbi.setStride(0);
-
-            // Allocate a native buffer
-            vbi.setVertexBuffer(ByteBuffer.allocateDirect(BYTES_PER_FLOAT * FLOATS_PER_BONE * numBones).order(ByteOrder.nativeOrder()).asFloatBuffer());
-        }
-    };
-
-Now we can create the animation with the vertex buffer info::
-
-	SpineAnimation animation = factory.create(listener, vbi);
+    animation.setSpineVertexBufferInfo(vbi);
 
 Set the animation and track::
 
