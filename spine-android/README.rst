@@ -9,8 +9,7 @@ This implementation leverages the spine-c implementation and provides a simple J
 
 The JSON files produced by spline simply needs to be placed in the **assets** folder of your android app.
 
-.. note::
-    This library is limited to running simple animations and is not a full spine runtime.
+.. note:: This library is limited to running simple animations and is not a full spine runtime.
 
 Build the library::
 
@@ -37,7 +36,7 @@ We do this via a listener so we know how many bones are in the animation::
     final BasicSpineVertexBufferInfo vbi = new BasicSpineVertexBufferInfo();
 
     static final int BYTES_PER_FLOAT = 4;
-	static final int FLOATS_PER_BONE = 12; // 6 x 2 coords for GL_TRIANGLES
+    static final int FLOATS_PER_BONE = 12; // 6 x 2 coords for GL_TRIANGLES
 
     SpineAnimationListener listener = new SpineAnimationListener() {
         @Override
@@ -85,3 +84,4 @@ Get the bone data::
 On destroy clean up::
 
     factory.destroy();
+
