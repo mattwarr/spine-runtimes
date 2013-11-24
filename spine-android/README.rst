@@ -75,7 +75,7 @@ Step the animation::
 
 	animation.step(delta); // delta is in milliseconds
 
-Update in game objects.  The vertex data for each bone will have been written to the vertex buffer allocated in the ```SpineVertexBufferInfo``` instance
+Update in game objects.  The vertex data for each bone will have been written to the vertex buffer allocated in the ``SpineVertexBufferInfo`` instance
 
 On destroy clean up::
 
