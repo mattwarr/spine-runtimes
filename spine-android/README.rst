@@ -9,7 +9,7 @@ This implementation leverages the spine-c implementation and provides a simple J
 
 The JSON files produced by spline simply needs to be placed in the **assets** folder of your android app.
 
- .. note::
+.. note::
 
     This library is limited to running simple animations and is not a full spine runtime.
 
