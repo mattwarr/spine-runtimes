@@ -75,11 +75,7 @@ Step the animation::
 
 	animation.step(delta); // delta is in milliseconds
 
-Get the bone data::
-
-	for (SpineBone bone : animation.bones) {
-	    // Update in-game objects with SRT from bone
-	}
+Update in game objects.  The vertex data for each bone will have been written to the vertex buffer allocated in the ```SpineVertexBufferInfo``` instance
 
 On destroy clean up::
 
