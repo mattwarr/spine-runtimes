@@ -35,15 +35,19 @@ Now we can create the animation::
 
 Animation data is written to a native buffer, so we need to allocate a buffer and specify the offset/stride::
 
-	final int BYTES_PER_FLOAT = 4;
-	final int FLOATS_PER_BONE = 12; // 6 x 2 coords for GL_TRIANGLES
+    final int BYTES_PER_FLOAT = 4;
+    final int FLOATS_PER_BONE = 12; // 6 x 2 coords for GL_TRIANGLES
 
     BasicSpineVertexBufferInfo vbi = new BasicSpineVertexBufferInfo();
     vbi.setDrawMode(GLES20.GL_TRIANGLES);
     vbi.setOffset(0);
     vbi.setStride(0);
 
-    vbi.setVertexBuffer(ByteBuffer.allocateDirect(BYTES_PER_FLOAT * FLOATS_PER_BONE * animation.numBones).order(ByteOrder.nativeOrder()).asFloatBuffer());
+    vbi.setVertexBuffer(
+        ByteBuffer.allocateDirect(
+            BYTES_PER_FLOAT * FLOATS_PER_BONE * animation.numBones)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer());
 
     animation.setSpineVertexBufferInfo(vbi);
 
