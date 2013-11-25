@@ -25,8 +25,6 @@ public:
 
 	float* getVertexBuffer(JNIEnv* env);
 
-	int getBufferOffset(JNIEnv* env);
-
 	int getStride(JNIEnv* env);
 
 	int getDrawMode(JNIEnv* env);
@@ -45,7 +43,6 @@ private:
 	jmethodID getVertexBufferID;
 	jmethodID getStrideID;
 	jmethodID getDrawModeID;
-	jmethodID getBufferOffsetID;
 	std::map<const char*, int> boneMapping;
 };
 

@@ -20,7 +20,6 @@ SpineCallback::SpineCallback(JNIEnv* env, jobject jCallback) {
 	getVertexBufferID = env->GetMethodID(callbackClass, "getVertexBuffer", "()Ljava/nio/FloatBuffer;");
 	getStrideID = env->GetMethodID(callbackClass, "getStride", "()I");
 	getDrawModeID = env->GetMethodID(callbackClass, "getDrawMode", "()I");
-	getBufferOffsetID = env->GetMethodID(callbackClass, "getBufferOffset", "()I");
 }
 
 SpineCallback::~SpineCallback() {}
@@ -41,10 +40,6 @@ float* SpineCallback::getVertexBuffer(JNIEnv* env) {
 	}
 
 	return NULL;
-}
-
-int SpineCallback::getBufferOffset(JNIEnv* env) {
-	return (int) env->CallIntMethod(jCallback, getBufferOffsetID);
 }
 
 int SpineCallback::getStride(JNIEnv* env) {

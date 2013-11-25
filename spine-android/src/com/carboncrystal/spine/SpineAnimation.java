@@ -37,10 +37,13 @@ public class SpineAnimation {
 		if(animationListener != null) {
 			animationListener.onCreateSkeleton(numBones);
 		}
+
+		verifyBuffer();
 	}
 
 	public void setSpineVertexBufferInfo(SpineVertexBufferInfo vertexBufferInfo) {
 		this.vertexBufferInfo = vertexBufferInfo;
+		verifyBuffer();
 		init(addr);
 	}
 
@@ -132,6 +135,24 @@ public class SpineAnimation {
 
 	void setAnimationListener(SpineAnimationListener animationListener) {
 		this.animationListener = animationListener;
+	}
+
+	void verifyBuffer() {
+		if(vertexBufferInfo != null && numBones > 0) {
+
+			final int FLOATS_PER_BONE = 18; // 6 x 3 coords (x,y,z)
+
+			int capacity = vertexBufferInfo.getVertexBuffer().capacity();
+			int expected = FLOATS_PER_BONE * numBones;
+
+			if(capacity < expected) {
+				throw new ArrayIndexOutOfBoundsException("Buffer capacity [" +
+						capacity +
+						"] is less than required [" +
+						expected +
+						"]");
+			}
+		}
 	}
 
 	native void setXY(long addr, float x, float y);

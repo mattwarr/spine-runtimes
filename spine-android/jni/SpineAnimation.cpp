@@ -74,6 +74,21 @@ bool SpineAnimation::addAnimation(JNIEnv* env, int trackIndex, const char* name,
 	}
 }
 
+void SpineAnimation::init(JNIEnv* env) {
+
+	this->vertices = this->callback->getVertexBuffer(env);
+	this->stride = this->callback->getStride(env);
+	this->drawMode = this->callback->getDrawMode(env);
+	this->buffer = new float[8]; // 4x2 vert coords.  This is what spine produces.
+	this->translator = NULL;
+
+	switch(this->drawMode) {
+		case GL_TRIANGLES:
+			this->translator = new GLTrianglesVertexTranslator();
+			break;
+	}
+}
+
 void SpineAnimation::step(JNIEnv* env, float deltaTime) {
 
 	pthread_mutex_lock(&mutex);
@@ -106,11 +121,13 @@ void SpineAnimation::draw(JNIEnv* env, int offset) {
 				bufferIndex += this->translator->translate(this->buffer, this->vertices, bufferIndex, this->stride);
 			}
 			else {
+				callback->onError(env, "No vertex buffer found!");
 				__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "No vertex buffer found!");
 				break;
 			}
 		}
 		else {
+			callback->onError(env, "No vertex translator found!");
 			__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "No vertex translator defined!");
 			break;
 		}
@@ -119,19 +136,6 @@ void SpineAnimation::draw(JNIEnv* env, int offset) {
 	pthread_mutex_unlock(&mutex);
 }
 
-void SpineAnimation::init(JNIEnv* env) {
-	this->vertices = this->callback->getVertexBuffer(env);
-	this->stride = this->callback->getStride(env);
-	this->drawMode = this->callback->getDrawMode(env);
-	this->buffer = new float[8]; // 4x2 vert coords
-	this->translator = NULL;
-
-	switch(this->drawMode) {
-		case GL_TRIANGLES:
-			this->translator = new GLTrianglesVertexTranslator();
-			break;
-	}
-}
 
 void SpineAnimation::destroy(JNIEnv* env) {
 	if (this->skeleton) {

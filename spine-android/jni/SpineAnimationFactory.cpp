@@ -11,28 +11,36 @@
 #include <spine/extension.h>
 #include <spine/SkeletonJson.h>
 #include <android/log.h>
+#include <spine_context.h>
 
 SpineAnimationFactory::SpineAnimationFactory(const char* atlasPath, const char* skeletonPath) {
 	int length;
 	this->error = false;
 
-	spAtlas* atlas = spAtlas_readAtlasFile(atlasPath);
-
-	spSkeletonJson* skeletonJson = spSkeletonJson_create(atlas);
-
-	const char* json = _spUtil_readFile(skeletonPath, &length);
-
-	this->skeletonData = spSkeletonJson_readSkeletonData(skeletonJson, json);
-
-	if (skeletonJson->error) {
+	if(!is_spine_context_initialized()) {
 		this->error = true;
 		__android_log_print(ANDROID_LOG_ERROR, "SpineAndroid",
-				"Error creating spSkeletonJson: %s", skeletonJson->error);
+						"SpineContext not intitialized");
 	}
+	else {
+		spAtlas* atlas = spAtlas_readAtlasFile(atlasPath);
 
-	spAtlas_dispose(atlas);
-	spSkeletonJson_dispose(skeletonJson);
-	FREE(json);
+		spSkeletonJson* skeletonJson = spSkeletonJson_create(atlas);
+
+		const char* json = _spUtil_readFile(skeletonPath, &length);
+
+		this->skeletonData = spSkeletonJson_readSkeletonData(skeletonJson, json);
+
+		if (skeletonJson->error) {
+			this->error = true;
+			__android_log_print(ANDROID_LOG_ERROR, "SpineAndroid",
+					"Error creating spSkeletonJson: %s", skeletonJson->error);
+		}
+
+		spAtlas_dispose(atlas);
+		spSkeletonJson_dispose(skeletonJson);
+		FREE(json);
+	}
 }
 
 SpineAnimationFactory::~SpineAnimationFactory() {

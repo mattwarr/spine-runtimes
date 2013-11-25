@@ -9,3 +9,5 @@ extern "C"
 JavaVM* get_jni_env();
 
 AAssetManager* get_asset_manager();
+
+bool is_spine_context_initialized();
