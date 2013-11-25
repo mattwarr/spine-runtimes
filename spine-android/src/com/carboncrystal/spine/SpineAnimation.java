@@ -79,16 +79,6 @@ public class SpineAnimation {
 		return (vertexBufferInfo == null) ? GLES20.GL_TRIANGLES : vertexBufferInfo.getDrawMode();
 	}
 
-	/**
-	 * Returns the offset into the buffer that this animation will start writing floats.
-	 * CALLED FROM NATIVE CODE.
-	 * @return
-	 */
-	@SuppressWarnings("unused")
-	final int getBufferOffset() {
-		return (vertexBufferInfo == null) ? 0 : vertexBufferInfo.getOffset();
-	}
-
 	// Called from native
 	@SuppressWarnings("unused")
 	final void addBone(int index,
@@ -119,6 +109,12 @@ public class SpineAnimation {
 		}
 	}
 
+	public final void draw(int offset) {
+		if(!destroyed) {
+			draw(addr, offset);
+		}
+	}
+
 	public final boolean setAnimation(int trackIndex, String name, boolean loop) {
 		return !destroyed && setAnimation(addr, trackIndex, name, loop);
 	}
@@ -139,6 +135,8 @@ public class SpineAnimation {
 	}
 
 	native void setXY(long addr, float x, float y);
+
+	native void draw(long addr, int offset);
 
 	native void step(long addr, float deltaTime);
 

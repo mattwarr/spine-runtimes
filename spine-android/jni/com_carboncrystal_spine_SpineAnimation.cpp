@@ -10,6 +10,15 @@ JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_step
 	}
 }
 
+
+JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_draw
+  (JNIEnv *env, jobject caller, jlong addr, jint offset) {
+	SpineAnimation* anim = (SpineAnimation*) addr;
+	if(anim) {
+		anim->draw(env, offset);
+	}
+}
+
 JNIEXPORT jboolean JNICALL Java_com_carboncrystal_spine_SpineAnimation_setAnimation
   (JNIEnv *env, jobject caller, jlong addr, jint trackIndex, jstring name, jboolean loop) {
 	SpineAnimation* anim = (SpineAnimation*) addr;

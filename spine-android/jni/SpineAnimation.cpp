@@ -10,6 +10,11 @@
 #include <spine/Slot.h>
 #include <android/log.h>
 #include <GLTrianglesVertexTranslator.h>
+#include <pthread.h>
+#include <errno.h>
+#include <string.h>
+
+pthread_mutex_t	mutex = PTHREAD_MUTEX_INITIALIZER;
 
 SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* cb) {
 	this->callback = cb;
@@ -35,6 +40,13 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 				env,
 				i,
 				slot);
+	}
+
+	// Initialize the mutex to lock between draw and step
+	int mutexInitState = pthread_mutex_init (&mutex , NULL );
+
+	if(mutexInitState != 0) {
+		callback->onError(env, "Error initializing mutex: %s", strerror(errno));
 	}
 }
 
@@ -64,11 +76,20 @@ bool SpineAnimation::addAnimation(JNIEnv* env, int trackIndex, const char* name,
 
 void SpineAnimation::step(JNIEnv* env, float deltaTime) {
 
+	pthread_mutex_lock(&mutex);
+
 	spAnimationState_update(state, deltaTime);
 	spAnimationState_apply(state, skeleton);
 	spSkeleton_updateWorldTransform(skeleton);
 
-	int i, bufferIndex = this->offset;
+	pthread_mutex_unlock(&mutex);
+}
+
+void SpineAnimation::draw(JNIEnv* env, int offset) {
+
+	int i, bufferIndex = offset;
+
+	pthread_mutex_lock(&mutex);
 
 	for(i = 0; i < skeleton->slotCount; i++) {
 
@@ -94,12 +115,13 @@ void SpineAnimation::step(JNIEnv* env, float deltaTime) {
 			break;
 		}
 	}
+
+	pthread_mutex_unlock(&mutex);
 }
 
 void SpineAnimation::init(JNIEnv* env) {
 	this->vertices = this->callback->getVertexBuffer(env);
 	this->stride = this->callback->getStride(env);
-	this->offset = this->callback->getBufferOffset(env);
 	this->drawMode = this->callback->getDrawMode(env);
 	this->buffer = new float[8]; // 4x2 vert coords
 	this->translator = NULL;
@@ -131,4 +153,6 @@ void SpineAnimation::destroy(JNIEnv* env) {
 	}
 }
 
-SpineAnimation::~SpineAnimation() {}
+SpineAnimation::~SpineAnimation() {
+	pthread_mutex_destroy ( &mutex );
+}

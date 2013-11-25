@@ -8,7 +8,5 @@ public abstract class SpineVertexBufferInfo {
 
 	public abstract int getStride();
 
-	public abstract int getOffset();
-
 	public abstract int getDrawMode();
 }

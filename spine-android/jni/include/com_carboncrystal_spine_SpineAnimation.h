@@ -17,6 +17,14 @@ JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_setXY
 
 /*
  * Class:     com_carboncrystal_spine_SpineAnimation
+ * Method:    draw
+ * Signature: (JI)V
+ */
+JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_draw
+  (JNIEnv *, jobject, jlong, jint);
+
+/*
+ * Class:     com_carboncrystal_spine_SpineAnimation
  * Method:    step
  * Signature: (JF)V
  */

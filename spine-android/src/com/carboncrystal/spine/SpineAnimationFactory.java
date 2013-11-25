@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,12 +18,11 @@ public class SpineAnimationFactory {
 	private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
 	private final long addr;
-	private SpineAnimation[] animations;
+	private ArrayList<SpineAnimation> animations;
 	private int createIndex = 0;
-	private final int size;
 	private final Map<String, SpineAttachment> slots;
 
-	public SpineAnimationFactory(Context context, String atlasPath, String skeletonPath, int size) {
+	public SpineAnimationFactory(Context context, String atlasPath, String skeletonPath) {
 
 		// We're not going to verify on the native side, so do it here
 		AssetManager am = context.getAssets();
@@ -46,8 +46,7 @@ public class SpineAnimationFactory {
 			throw new RuntimeException("Failed to create factory.  Check logs for error");
 		}
 
-		this.animations = new SpineAnimation[size];
-		this.size = size;
+		this.animations = new ArrayList<SpineAnimation>();
 
 		// Create a local lookup for bone-to-attachment names
 		slots = new HashMap<String, SpineAttachment>();
@@ -75,32 +74,29 @@ public class SpineAnimationFactory {
 	}
 
 	public final SpineAnimation create(SpineAnimationListener listener) {
-		if(createIndex < animations.length) {
+//		if(createIndex < animations.length) {
 			SpineAnimation animation = new SpineAnimation(createIndex, slots);
 			animation.setAnimationListener(listener);
 			animation.addr = createAnimation(addr, animation);
 			if(SpineContext.isNULL(animation.addr)) {
 				throw new RuntimeException("Error creating animation.  Check native logs");
 			}
-			animations[createIndex++] = animation;
+			animations.add(animation);
 			return animation;
-		}
-		else {
-			throw new ArrayIndexOutOfBoundsException("Exceeded max size [" +
-					size +
-					"] in factory");
-		}
+//		}
+//		else {
+//			throw new ArrayIndexOutOfBoundsException("Exceeded max size [" +
+//					size +
+//					"] in factory");
+//		}
 	}
 
 	public final SpineAnimation get(int index) {
-		return animations[index];
+		return animations.get(index);
 	}
 
 	public final void destroy() {
 		for (SpineAnimation animation : animations) {
-			if(animation == null) {
-				break;
-			}
 			animation.destroy();
 		}
 		destroy(addr);
@@ -112,9 +108,6 @@ public class SpineAnimationFactory {
 	 */
 	public final void step(long time) {
 		for (SpineAnimation animation : animations) {
-			if(animation == null) {
-				break;
-			}
 			animation.step(time);
 		}
 	}

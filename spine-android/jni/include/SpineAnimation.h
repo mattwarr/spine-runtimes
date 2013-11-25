@@ -38,6 +38,8 @@ public:
 
 	void step(JNIEnv* env, float deltaTime);
 
+	void draw(JNIEnv* env, int offset);
+
 	void destroy(JNIEnv* env);
 
 	void init(JNIEnv* env);
@@ -56,7 +58,6 @@ private:
 	VertexTranslator* translator;
 	float* vertices;
 	float* buffer;
-	int offset;
 	int stride;
 	int drawMode;
 	float x;
