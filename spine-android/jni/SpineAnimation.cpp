@@ -27,7 +27,7 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 	this->y = 0;
 
 	// TODO: Remove this
-	this->skeleton->flipY = 1;
+//	this->skeleton->flipY = 1;
 
 	int i;
 
