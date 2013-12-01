@@ -118,7 +118,7 @@ void SpineAnimation::draw(JNIEnv* env, int offset) {
 		// translate the tmp buffer into the output buffer.
 		if(this->translator) {
 			if(this->vertices) {
-				bufferIndex += this->translator->translate(this->buffer, this->vertices, bufferIndex, this->stride);
+				bufferIndex = this->translator->translate(this->buffer, this->vertices, bufferIndex, this->stride);
 			}
 			else {
 				callback->onError(env, "No vertex buffer found!");
