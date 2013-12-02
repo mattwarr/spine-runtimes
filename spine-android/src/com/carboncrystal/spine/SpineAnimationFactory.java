@@ -39,7 +39,6 @@ public class SpineAnimationFactory {
 					"] does not exist");
 		}
 
-
 		this.addr = create(atlasPath, skeletonPath);
 
 		if(SpineContext.isNULL(this.addr)) {
@@ -74,21 +73,14 @@ public class SpineAnimationFactory {
 	}
 
 	public final SpineAnimation create(SpineAnimationListener listener) {
-//		if(createIndex < animations.length) {
-			SpineAnimation animation = new SpineAnimation(createIndex, slots);
-			animation.setAnimationListener(listener);
-			animation.addr = createAnimation(addr, animation);
-			if(SpineContext.isNULL(animation.addr)) {
-				throw new RuntimeException("Error creating animation.  Check native logs");
-			}
-			animations.add(animation);
-			return animation;
-//		}
-//		else {
-//			throw new ArrayIndexOutOfBoundsException("Exceeded max size [" +
-//					size +
-//					"] in factory");
-//		}
+		SpineAnimation animation = new SpineAnimation(createIndex, slots);
+		animation.setAnimationListener(listener);
+		animation.addr = createAnimation(addr, animation);
+		if(SpineContext.isNULL(animation.addr)) {
+			throw new RuntimeException("Error creating animation.  Check native logs");
+		}
+		animations.add(animation);
+		return animation;
 	}
 
 	public final SpineAnimation get(int index) {

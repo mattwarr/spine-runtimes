@@ -153,7 +153,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		}
 
 		/* Check if completed the animation or a loop iteration. */
-		if (current->loop ? (FMOD(current->lastTime, current->endTime) > FMOD(time, current->endTime)) //
+		if (current->loop ? (FMOD(current->lastTime, current->endTime) > FMOD(time, current->endTime))
 				: (current->lastTime < current->endTime && time >= current->endTime)) {
 			int count = (int)(time / current->endTime);
 			if (current->listener) current->listener(self, i, ANIMATION_COMPLETE, 0, count);

@@ -49,6 +49,22 @@ JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_init
 
 /*
  * Class:     com_carboncrystal_spine_SpineAnimation
+ * Method:    sync
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_sync
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     com_carboncrystal_spine_SpineAnimation
+ * Method:    getAABB
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_getAABB
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     com_carboncrystal_spine_SpineAnimation
  * Method:    setAnimation
  * Signature: (JILjava/lang/String;Z)Z
  */

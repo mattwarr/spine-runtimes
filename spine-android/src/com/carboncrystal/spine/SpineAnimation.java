@@ -1,5 +1,6 @@
 package com.carboncrystal.spine;
 
+import android.graphics.RectF;
 import android.opengl.GLES20;
 
 import java.nio.FloatBuffer;
@@ -10,6 +11,8 @@ public class SpineAnimation {
 	public final int index;
 
 	public SpineBone[] bones;
+
+	private final RectF aabb = new RectF();
 
 	public int numBones;
 
@@ -52,6 +55,22 @@ public class SpineAnimation {
 	}
 
 	/**
+	 * Triggers the native side to send back bone SRT data.
+	 */
+	public final void syncBones() {
+		sync(addr);
+	}
+
+	/**
+	 * Returns the axis aligned bounding box for the animation in its current state
+	 * @return
+	 */
+	public final RectF getAABB() {
+		getAABB(addr);
+		return aabb;
+	}
+
+	/**
 	 * Returns the buffer into which attachment vertices will be written.
 	 * CALLED FROM NATIVE CODE.
 	 * @return
@@ -84,13 +103,35 @@ public class SpineAnimation {
 
 	// Called from native
 	@SuppressWarnings("unused")
+	final void setBoneSRT(int index, float worldX, float worldY, float worldRotation) {
+		SpineBone bone = bones[index];
+		if(bone != null) {
+			bone.worldX = worldX;
+			bone.worldY = worldY;
+			bone.worldRotation = worldRotation  ;
+		}
+	}
+
+	// Called from native
+	@SuppressWarnings("unused")
+	final void setAABB(float minX, float minY, float maxX, float maxY) {
+		aabb.set(minX, maxY, maxX, minY);
+	}
+
+	// Called from native
+	@SuppressWarnings("unused")
 	final void addBone(int index,
 	               String slotName,
-	               String boneName) {
+	               String boneName,
+	               String attachmentName,
+	               float x,
+	               float y) {
 
 		SpineBone bone = new SpineBone();
 
 		bone.name = boneName;
+		bone.x = x;
+		bone.y = y;
 
 		// Get the attachment from the slot
 		bone.attachment = slots.get(slotName);
@@ -99,6 +140,15 @@ public class SpineAnimation {
 
 		if(animationListener != null) {
 			animationListener.onCreateBone(bone);
+		}
+	}
+
+	// Called from native
+	@SuppressWarnings("unused")
+	final void setBoneParent(int index, int parentBoneIndex) {
+		SpineBone bone = bones[index];
+		if(parentBoneIndex >= 0) {
+			bone.parent = bones[parentBoneIndex];
 		}
 	}
 
@@ -164,6 +214,10 @@ public class SpineAnimation {
 	native void destroy(long addr);
 
 	native void init(long addr);
+
+	native void sync(long addr);
+
+	native void getAABB(long addr);
 
 	native boolean setAnimation(long addr, int trackIndex, String name, boolean loop);
 

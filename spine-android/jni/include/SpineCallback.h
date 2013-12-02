@@ -31,6 +31,12 @@ public:
 
 	void addBone(JNIEnv* env, int index, spSlot* slot);
 
+	void setAABB(JNIEnv* env, float minX, float minY, float maxX, float maxY);
+
+	void setBoneSRT(JNIEnv* env, int index, float worldX, float worldY, float worldRotation);
+
+	void setBoneParent(JNIEnv* env, int index, const char * parentBoneName);
+
 	void onError(JNIEnv* env, const char * format, ...);
 
 	void destroy(JNIEnv* env);
@@ -40,6 +46,9 @@ private:
 	jclass callbackClass;
 	jmethodID onCreateID;
 	jmethodID addBoneID;
+	jmethodID setParentID;
+	jmethodID setBoneSRTID;
+	jmethodID setAABBID;
 	jmethodID getVertexBufferID;
 	jmethodID getStrideID;
 	jmethodID getDrawModeID;

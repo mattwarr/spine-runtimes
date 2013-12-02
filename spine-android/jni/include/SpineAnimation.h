@@ -14,7 +14,7 @@
 #include <spine/spine.h>
 #include <SpineCallback.h>
 #include <VertexTranslator.h>
-
+#include <map>
 
 // Correspond to android.opengl.GLES20 statics
 #define GL_POINTS 			0
@@ -24,6 +24,10 @@
 #define GL_TRIANGLES 		4
 #define GL_TRIANGLE_STRIP 	5
 #define GL_TRIANGLE_FAN 	6
+
+struct spBounds {
+	float minX, minY, maxX, maxY;
+};
 
 class SpineAnimation {
 
@@ -44,6 +48,10 @@ public:
 
 	void init(JNIEnv* env);
 
+	void sync(JNIEnv* env);
+
+	void getAABB(JNIEnv* env);
+
 	bool getBufferAddress(JNIEnv * env, jobject owner);
 
 	void setXY(float x, float y) {
@@ -51,13 +59,21 @@ public:
 		this->y = y;
 	}
 
+	/**
+	 * Calculates the center point and rotation angle for the given bounding box
+	 */
+	double calculateCenterAndAngle(float* vertices, float* out);
+
 private:
 	spSkeleton* skeleton;
 	spAnimationState* state;
 	SpineCallback* callback;
 	VertexTranslator* translator;
+	spBounds* bounds;
+	std::map<const char*, float*> boneVertBuffers;
+
 	float* vertices;
-	float* buffer;
+	float* center;
 	int stride;
 	int drawMode;
 	float x;

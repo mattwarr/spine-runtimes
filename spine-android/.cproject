@@ -23,7 +23,7 @@
 					<folderInfo id="com.android.toolchain.gcc.424465267.1515923132" name="/" resourcePath="">
 						<toolChain id="com.android.toolchain.gcc.488444540" name="Android GCC" superClass="com.android.toolchain.gcc">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="com.android.targetPlatform.1236363207" isAbstract="false" superClass="com.android.targetPlatform"/>
-							<builder id="com.android.builder.969149308" managedBuildOn="false" name="Android Builder.Default" superClass="com.android.builder"/>
+							<builder id="com.android.builder.969149308" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Android Builder" superClass="com.android.builder"/>
 							<tool id="com.android.gcc.compiler.67791383" name="Android GCC Compiler" superClass="com.android.gcc.compiler">
 								<option id="com.android.gcc.option.includePath.803763124" superClass="com.android.gcc.option.includePath" valueType="includePath">
 									<listOptionValue builtIn="false" value="/Applications/android-ndk-r9/sources/cxx-stl/stlport/stlport"/>
@@ -32,6 +32,9 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="jni"/>
+					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -46,6 +49,9 @@
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="com.android.toolchain.gcc.424465267;com.android.toolchain.gcc.424465267.1515923132;com.android.gcc.compiler.197365888;com.android.gcc.inputType.2126402478">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.android.AndroidPerProjectProfile"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.android.toolchain.gcc.424465267;com.android.toolchain.gcc.424465267.1515923132;com.android.gcc.compiler.67791383;com.android.gcc.inputType.1759043029">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.android.AndroidPerProjectProfile"/>
 		</scannerConfigBuildInfo>
 	</storageModule>

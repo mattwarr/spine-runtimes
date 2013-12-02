@@ -10,7 +10,6 @@ JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_step
 	}
 }
 
-
 JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_draw
   (JNIEnv *env, jobject caller, jlong addr, jint offset) {
 	SpineAnimation* anim = (SpineAnimation*) addr;
@@ -58,6 +57,19 @@ JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_init(JNIEnv *
 	}
 }
 
+JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_sync(JNIEnv *e, jobject caller,  jlong addr) {
+	SpineAnimation* anim = (SpineAnimation*) addr;
+	if(anim) {
+		anim->sync(e);
+	}
+}
+
+JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_getAABB(JNIEnv *e, jobject caller,  jlong addr) {
+	SpineAnimation* anim = (SpineAnimation*) addr;
+	if(anim) {
+		anim->getAABB(e);
+	}
+}
 
 JNIEXPORT void JNICALL Java_com_carboncrystal_spine_SpineAnimation_destroy(JNIEnv *e, jobject caller,  jlong addr) {
 	SpineAnimation* anim = (SpineAnimation*) addr;
