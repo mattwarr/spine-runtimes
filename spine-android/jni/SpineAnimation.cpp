@@ -64,9 +64,6 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 		}
 	}
 
-	// Set to initial pose
-	spSkeleton_setToSetupPose(this->skeleton);
-
 	// Initialize the mutex to lock between draw and step
 	int mutexInitState = pthread_mutex_init (&mutex , NULL );
 
@@ -112,16 +109,25 @@ void SpineAnimation::init(JNIEnv* env) {
 			this->translator = new GLTrianglesVertexTranslator();
 			break;
 	}
+
+	// Set to initial pose
+	spSkeleton_setToSetupPose(this->skeleton);
+
+	// Compute the starting verts
+	int i;
+	for(i = 0; i < skeleton->slotCount; i++) {
+		spSlot* slot = skeleton->drawOrder[i];
+		spBone* bone = slot->bone;
+		float* buffer = this->boneVertBuffers[ bone->data->name ];
+		spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, buffer);
+	}
 }
 
 void SpineAnimation::getAABB(JNIEnv* env) {
 
 	bounds->minX = (float)INT_MAX;
-
 	bounds->minY = (float)INT_MAX;
-
 	bounds->maxX = (float)INT_MIN;
-
 	bounds->maxY = (float)INT_MIN;
 
 	int i, j;
@@ -209,10 +215,8 @@ void SpineAnimation::draw(JNIEnv* env, int offset) {
 
 		float* buffer = this->boneVertBuffers[ bone->data->name ];
 
-		// Read the verts into the temp buffer
 		spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, buffer);
 
-		// translate the tmp buffer into the output buffer.
 		if(this->translator) {
 			if(this->vertices) {
 				bufferIndex = this->translator->translate( buffer, this->vertices, bufferIndex, this->stride);

@@ -108,7 +108,7 @@ public class SpineAnimation {
 		if(bone != null) {
 			bone.worldX = worldX;
 			bone.worldY = worldY;
-			bone.worldRotation = worldRotation  ;
+			bone.worldRotation = worldRotation;
 		}
 	}
 
