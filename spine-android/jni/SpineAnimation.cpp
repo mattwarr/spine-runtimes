@@ -34,11 +34,15 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 
 	int i;
 
+	// Set to initial pose
+	spSkeleton_setToSetupPose(this->skeleton);
+
 	// Update transform so the bone's world position is set
 	spSkeleton_updateWorldTransform(skeleton);
 
 	for(i = 0; i < skeleton->slotCount; i++) {
 		spSlot* slot = skeleton->drawOrder[i];
+		spBone* bone = slot->bone;
 		this->callback->addBone(
 				env,
 				i,
@@ -49,6 +53,8 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 
 		this->boneVertBuffers[boneName] = new float[BUFFER_SIZE];  // 4 x 2 coords
 
+		// Compute the starting verts
+		spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, this->boneVertBuffers[boneName]);
 	}
 
 	// Loop again tp set the parents
@@ -63,6 +69,8 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 					parent->data->name);
 		}
 	}
+
+	this->center = new float[2]; // x, y
 
 	// Initialize the mutex to lock between draw and step
 	int mutexInitState = pthread_mutex_init (&mutex , NULL );
@@ -101,7 +109,6 @@ void SpineAnimation::init(JNIEnv* env) {
 	this->vertices = this->callback->getVertexBuffer(env);
 	this->stride = this->callback->getStride(env);
 	this->drawMode = this->callback->getDrawMode(env);
-	this->center = new float[2]; // x, y
 	this->translator = NULL;
 
 	switch(this->drawMode) {
@@ -110,17 +117,6 @@ void SpineAnimation::init(JNIEnv* env) {
 			break;
 	}
 
-	// Set to initial pose
-	spSkeleton_setToSetupPose(this->skeleton);
-
-	// Compute the starting verts
-	int i;
-	for(i = 0; i < skeleton->slotCount; i++) {
-		spSlot* slot = skeleton->drawOrder[i];
-		spBone* bone = slot->bone;
-		float* buffer = this->boneVertBuffers[ bone->data->name ];
-		spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, buffer);
-	}
 }
 
 void SpineAnimation::getAABB(JNIEnv* env) {
@@ -264,11 +260,12 @@ void SpineAnimation::destroy(JNIEnv* env) {
 
 double SpineAnimation::calculateCenterAndAngle(float* vertices, float* out) {
 
-	out[0] = (vertices[VERTEX_X1] + vertices[VERTEX_X3]) / 2.0f;
-	out[1] = (vertices[VERTEX_Y1] + vertices[VERTEX_Y3]) / 2.0f;
+	out[0] = (vertices[VERTEX_X2] + vertices[VERTEX_X4]) / 2.0f;
+	out[1] = (vertices[VERTEX_Y2] + vertices[VERTEX_Y4]) / 2.0f;
 
-	float diffX = vertices[VERTEX_X1] - vertices[VERTEX_X4];
-	float diffY = vertices[VERTEX_Y1] - vertices[VERTEX_Y4];
+	float diffX = vertices[VERTEX_X2] - vertices[VERTEX_X1];
+	float diffY = vertices[VERTEX_Y2] - vertices[VERTEX_Y1];
+
 	double angle = atan(diffX/diffY);
 
 	if(diffY < 0) {

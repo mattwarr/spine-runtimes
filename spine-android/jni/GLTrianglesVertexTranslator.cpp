@@ -18,7 +18,6 @@ int GLTrianglesVertexTranslator::translate(float* vertices, float* output, int o
 
 	// GL_TRIANGLES CCW
 
-
 	// (top left)
 	output[offset] 	 = vertices[VERTEX_X2];
 	output[offset+1] = vertices[VERTEX_Y2];
