@@ -58,10 +58,13 @@ public class SpineAnimationFactory {
 
 			for (int i = 0; i < slots.length(); i++) {
 				JSONObject obj = slots.getJSONObject(i);
-				String name = obj.getString("attachment");
-				String slot = obj.getString("name");
-				SpineAttachment attachment = new SpineAttachment(name);
-				this.slots.put(slot, attachment);
+
+				if(obj.has("attachment") && !obj.isNull("attachment")) {
+					String name = obj.getString("attachment");
+					String slot = obj.getString("name");
+					SpineAttachment attachment = new SpineAttachment(name);
+					this.slots.put(slot, attachment);
+				}
 			}
 		}
 		catch (Exception e) {

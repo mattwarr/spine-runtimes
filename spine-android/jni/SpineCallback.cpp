@@ -16,7 +16,7 @@ SpineCallback::SpineCallback(JNIEnv* env, jobject jCallback) {
 	this->jCallback = env->NewGlobalRef(jCallback);
 	callbackClass = env->FindClass("com/carboncrystal/spine/SpineAnimation");
 	onCreateID = env->GetMethodID(callbackClass, "onSkeletonCreate", "(I)V");
-	addBoneID = env->GetMethodID(callbackClass, "addBone", "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;FF)V");
+	addBoneID = env->GetMethodID(callbackClass, "addBone", "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;FFF)V");
 	setParentID = env->GetMethodID(callbackClass, "setBoneParent", "(II)V");
 	setBoneSRTID = env->GetMethodID(callbackClass, "setBoneSRT", "(IFFF)V");
 	getVertexBufferID = env->GetMethodID(callbackClass, "getVertexBuffer", "()Ljava/nio/FloatBuffer;");
@@ -59,28 +59,31 @@ void SpineCallback::addBone(JNIEnv* env,
 
 	spBone* bone = slot->bone;
 
-	const char* boneName = bone->data->name;
-	const char* attachmentName = slot->attachment->name;
+	if(bone && bone->data && slot->attachment) {
+		const char* boneName = bone->data->name;
+		const char* attachmentName = slot->attachment->name;
 
-	this->boneMapping[boneName] = index;
+		this->boneMapping[boneName] = index;
 
-	float x = 0, y = 0;
+		float x = 0, y = 0;
 
-	jstring jSlotName = env->NewStringUTF(slot->data->name);
-	jstring jBoneName = env->NewStringUTF(boneName);
-	jstring jAttachmentName = env->NewStringUTF(attachmentName);
+		jstring jSlotName = env->NewStringUTF(slot->data->name);
+		jstring jBoneName = env->NewStringUTF(boneName);
+		jstring jAttachmentName = env->NewStringUTF(attachmentName);
 
-	env->CallVoidMethod(jCallback, addBoneID,
-			index,
-			jSlotName,
-			jBoneName,
-			jAttachmentName,
-			bone->x,
-			bone->y);
+		env->CallVoidMethod(jCallback, addBoneID,
+				index,
+				jSlotName,
+				jBoneName,
+				jAttachmentName,
+				bone->worldX,
+				bone->worldY,
+				bone->worldRotation);
 
-	env->DeleteLocalRef(jSlotName);
-	env->DeleteLocalRef(jBoneName);
-	env->DeleteLocalRef(jAttachmentName);
+		env->DeleteLocalRef(jSlotName);
+		env->DeleteLocalRef(jBoneName);
+		env->DeleteLocalRef(jAttachmentName);
+	}
 }
 
 void SpineCallback::setBoneSRT(JNIEnv* env, int index, float worldX, float worldY, float worldRotation) {

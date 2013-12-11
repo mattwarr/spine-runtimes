@@ -125,13 +125,15 @@ public class SpineAnimation {
 	               String boneName,
 	               String attachmentName,
 	               float x,
-	               float y) {
+	               float y,
+	               float rotation) {
 
 		SpineBone bone = new SpineBone();
 
 		bone.name = boneName;
 		bone.x = x;
 		bone.y = y;
+		bone.rotation = rotation;
 
 		// Get the attachment from the slot
 		bone.attachment = slots.get(slotName);

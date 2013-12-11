@@ -26,13 +26,24 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 	this->skeleton = spSkeleton_create(sd);
 	this->state = spAnimationState_create(spAnimationStateData_create(skeleton->data));
 	this->bounds = new spBounds();
-
-	// This will allocate the native array
-	this->callback->onSkeletonCreate(env, skeleton->slotCount);
 	this->x = 0;
 	this->y = 0;
 
-	int i;
+	// Count slots with attachments AND bones only
+	int i, bCount = 0;
+	for(i = 0; i < skeleton->slotCount; i++) {
+		spSlot* slot = skeleton->drawOrder[i];
+		spBone* bone = slot->bone;
+
+		if(bone && slot->attachment) {
+			bCount++;
+		}
+	}
+
+	// This will allocate the native array
+	this->callback->onSkeletonCreate(env, bCount);
+
+	int bIndex = 0;
 
 	// Set to initial pose
 	spSkeleton_setToSetupPose(this->skeleton);
@@ -43,30 +54,41 @@ SpineAnimation::SpineAnimation(JNIEnv* env, spSkeletonData* sd, SpineCallback* c
 	for(i = 0; i < skeleton->slotCount; i++) {
 		spSlot* slot = skeleton->drawOrder[i];
 		spBone* bone = slot->bone;
-		this->callback->addBone(
-				env,
-				i,
-				slot);
 
-		// create the buffer for this bone
-		const char* boneName = slot->bone->data->name;
+		if(bone && slot->attachment) {
+			this->callback->addBone(
+					env,
+					bIndex,
+					slot);
 
-		this->boneVertBuffers[boneName] = new float[BUFFER_SIZE];  // 4 x 2 coords
+			// create the buffer for this bone
+			const char* boneName = slot->bone->data->name;
 
-		// Compute the starting verts
-		spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, this->boneVertBuffers[boneName]);
+			this->boneVertBuffers[boneName] = new float[BUFFER_SIZE];  // 4 x 2 coords
+
+			// Compute the starting verts
+			spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, this->boneVertBuffers[boneName]);
+
+			bIndex++;
+		}
 	}
 
 	// Loop again tp set the parents
+	bIndex = 0;
 	for(i = 0; i < skeleton->slotCount; i++) {
 		spSlot* slot = skeleton->drawOrder[i];
-		spBone* parent = slot->bone->parent;
 
-		if(parent) {
-			this->callback->setBoneParent(
-					env,
-					i,
-					parent->data->name);
+		if(slot->bone && slot->attachment) {
+			spBone* parent = slot->bone->parent;
+
+			if(parent) {
+				this->callback->setBoneParent(
+						env,
+						bIndex,
+						parent->data->name);
+			}
+
+			bIndex++;
 		}
 	}
 
@@ -133,27 +155,29 @@ void SpineAnimation::getAABB(JNIEnv* env) {
 		spSlot* slot = skeleton->drawOrder[i];
 		spBone* bone = slot->bone;
 
-		float* buffer = this->boneVertBuffers [bone->data->name];
+		if(bone && slot->attachment) {
+			float* buffer = this->boneVertBuffers [bone->data->name];
 
-		for (j = 0; j < BUFFER_SIZE; j += 2) {
+			for (j = 0; j < BUFFER_SIZE; j += 2) {
 
-			float x = buffer[j];
-			float y = buffer[j + 1];
+				float x = buffer[j];
+				float y = buffer[j + 1];
 
-			if (x < bounds->minX) {
-				bounds->minX = x;
-			}
+				if (x < bounds->minX) {
+					bounds->minX = x;
+				}
 
-			if (y < bounds->minY) {
-				bounds->minY = y;
-			}
+				if (y < bounds->minY) {
+					bounds->minY = y;
+				}
 
-			if (x > bounds->maxX) {
-				bounds->maxX = x;
-			}
+				if (x > bounds->maxX) {
+					bounds->maxX = x;
+				}
 
-			if (y > bounds->maxY) {
-				bounds->maxY = y;
+				if (y > bounds->maxY) {
+					bounds->maxY = y;
+				}
 			}
 		}
 	}
@@ -167,22 +191,26 @@ void SpineAnimation::getAABB(JNIEnv* env) {
 }
 
 void SpineAnimation::sync(JNIEnv* env) {
-	int i;
+	int i, bIndex = 0;
 
 	for(i = 0; i < skeleton->slotCount; i++) {
 		spSlot* slot = skeleton->drawOrder[i];
 		spBone* bone = slot->bone;
 
-		float* buffer = this->boneVertBuffers [bone->data->name];
+		if(bone && slot->attachment) {
+			float* buffer = this->boneVertBuffers [bone->data->name];
 
-		double angle = this->calculateCenterAndAngle(buffer, this->center);
+			double angle = this->calculateCenterAndAngle(buffer, this->center);
 
-		this->callback->setBoneSRT(
-				env,
-				i,
-				this->center[0],
-				this->center[1],
-				(float) angle);
+			this->callback->setBoneSRT(
+					env,
+					bIndex,
+					this->center[0],
+					this->center[1],
+					(float) angle);
+
+			bIndex++;
+		}
 	}
 }
 
@@ -209,24 +237,26 @@ void SpineAnimation::draw(JNIEnv* env, int offset) {
 
 		spBone* bone = slot->bone;
 
-		float* buffer = this->boneVertBuffers[ bone->data->name ];
+		if(bone && slot->attachment) {
+			float* buffer = this->boneVertBuffers[ bone->data->name ];
 
-		spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, buffer);
+			spRegionAttachment_computeWorldVertices((spRegionAttachment*) slot->attachment, x, y, bone, buffer);
 
-		if(this->translator) {
-			if(this->vertices) {
-				bufferIndex = this->translator->translate( buffer, this->vertices, bufferIndex, this->stride);
+			if(this->translator) {
+				if(this->vertices) {
+					bufferIndex = this->translator->translate( buffer, this->vertices, bufferIndex, this->stride);
+				}
+				else {
+					callback->onError(env, "No vertex buffer found!");
+					__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "No vertex buffer found!");
+					break;
+				}
 			}
 			else {
-				callback->onError(env, "No vertex buffer found!");
-				__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "No vertex buffer found!");
+				callback->onError(env, "No vertex translator found!");
+				__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "No vertex translator defined!");
 				break;
 			}
-		}
-		else {
-			callback->onError(env, "No vertex translator found!");
-			__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "No vertex translator defined!");
-			break;
 		}
 	}
 

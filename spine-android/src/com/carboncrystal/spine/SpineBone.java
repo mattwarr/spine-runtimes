@@ -7,6 +7,7 @@ public class SpineBone {
 	public SpineBone parent;
 	public float x;
 	public float y;
+	public float rotation;
 
 	public float worldX;
 	public float worldY;
