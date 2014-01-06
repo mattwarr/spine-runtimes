@@ -154,7 +154,7 @@ public class SpineAnimation {
 		}
 	}
 
-	public final void setXY(float x, float y) {
+	public final void setScreenPosition(float x, float y) {
 		setXY(addr, x, y);
 	}
 
