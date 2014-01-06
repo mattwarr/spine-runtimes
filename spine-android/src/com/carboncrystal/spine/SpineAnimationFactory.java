@@ -76,7 +76,7 @@ public class SpineAnimationFactory {
 	}
 
 	public final SpineAnimation create(SpineAnimationListener listener) {
-		SpineAnimation animation = new SpineAnimation(createIndex, slots);
+		SpineAnimation animation = new SpineAnimation(createIndex++, slots);
 		animation.setAnimationListener(listener);
 		animation.addr = createAnimation(addr, animation);
 		if(SpineContext.isNULL(animation.addr)) {
